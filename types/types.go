@@ -4,11 +4,25 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
 	"sync"
 )
 
 // S is S-expression
-type S interface{}
+type S interface {
+	// String is representation of each S-expression
+	String() string
+}
+
+// IsAtom verify if given struct is atom or not.
+//
+// Atom is number, character, string, and vector.
+// All data construct is atom.
+// TODO interface is better??
+func IsAtom(s *S) bool {
+	t := reflect.TypeOf(s)
+	return t == Number || t == Symbol || t == Boolean
+}
 
 // Number is number of scheme. (based on Go float64)
 type Number float64
@@ -63,4 +77,51 @@ func (e *Env) Remove(s Symbol) {
 	e.Lock()
 	defer e.Unlock()
 	delete(e.m(s))
+}
+
+// Pair is cons
+type Pair struct {
+	car *S
+	cdr *S
+}
+
+func (p *Pair) String() string {
+	return fmt.Sprintf("(%s . %s)", p.car.String(), p.cdr.String())
+}
+
+// List is list of scheme
+type List struct {
+	*Pair
+}
+
+func (l *List) String() (str string) {
+	// TODO implementation
+	str = str + "("
+	if l.car == nil {
+		str = str + ")"
+		return str
+	} else if IsAtom(l.cdr) {
+		// TODO l.cdr should have String() but not. So use %v. It's not good.
+		str = fmt.Sprintf("%s . %v)", str, l.cdr)
+		return str
+	} else {
+		// l.cdr is list
+		str = str + l.cdr.String()
+		return str
+	}
+	return str
+}
+
+// Len returns length of list
+func (l *List) Len(num int) int {
+	length := num
+	if IsAtom(l.cdr) {
+		return length
+	}
+	list, ok := l.cdr.(List)
+	if !ok {
+		// TODO should return error
+		return length
+	}
+	return list.Len(length + 1)
 }
