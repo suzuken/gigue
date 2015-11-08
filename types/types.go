@@ -1,9 +1,7 @@
 package types
 
 import (
-	"errors"
 	"fmt"
-	"io"
 	"reflect"
 	"sync"
 )
@@ -19,9 +17,9 @@ type S interface {
 // Atom is number, character, string, and vector.
 // All data construct is atom.
 // TODO interface is better??
-func IsAtom(s *S) bool {
-	t := reflect.TypeOf(s)
-	return t == Number || t == Symbol || t == Boolean
+func IsAtom(s S) bool {
+	t := reflect.TypeOf(s).Name()
+	return t == "Number" || t == "Symbol" || t == "Boolean"
 }
 
 // Number is number of scheme. (based on Go float64)
@@ -33,7 +31,7 @@ type Symbol string
 // Boolean is boolean of scheme.
 type Boolean bool
 
-func (b *Boolean) String() string {
+func (b Boolean) String() string {
 	if b {
 		return "#t"
 	}
@@ -76,13 +74,13 @@ func (e *Env) Get(s Symbol) (*S, error) {
 func (e *Env) Remove(s Symbol) {
 	e.Lock()
 	defer e.Unlock()
-	delete(e.m(s))
+	delete(e.m, s)
 }
 
 // Pair is cons
 type Pair struct {
-	car *S
-	cdr *S
+	car S
+	cdr S
 }
 
 func (p *Pair) String() string {
@@ -94,7 +92,7 @@ type List struct {
 	*Pair
 }
 
-func (l *List) String() (str string) {
+func (l List) String() (str string) {
 	// TODO implementation
 	str = str + "("
 	if l.car == nil {
