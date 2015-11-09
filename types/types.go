@@ -2,25 +2,11 @@ package types
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 )
 
 // S is S-expression
-type S interface {
-	// String is representation of each S-expression
-	String() string
-}
-
-// IsAtom verify if given struct is atom or not.
-//
-// Atom is number, character, string, and vector.
-// All data construct is atom.
-// TODO interface is better??
-func IsAtom(s S) bool {
-	t := reflect.TypeOf(s).Name()
-	return t == "Number" || t == "Symbol" || t == "Boolean"
-}
+type S interface{}
 
 // Number is number of scheme. (based on Go float64)
 type Number float64
@@ -84,7 +70,7 @@ type Pair struct {
 }
 
 func (p *Pair) String() string {
-	return fmt.Sprintf("(%s . %s)", p.car.String(), p.cdr.String())
+	return fmt.Sprintf("(%s . %s)", p.car, p.cdr)
 }
 
 // List is list of scheme
@@ -98,13 +84,9 @@ func (l List) String() (str string) {
 	if l.car == nil {
 		str = str + ")"
 		return str
-	} else if IsAtom(l.cdr) {
-		// TODO l.cdr should have String() but not. So use %v. It's not good.
-		str = fmt.Sprintf("%s . %v)", str, l.cdr)
-		return str
 	} else {
 		// l.cdr is list
-		str = str + l.cdr.String()
+		str = str + fmt.Sprint(l.cdr)
 		return str
 	}
 	return str
@@ -113,9 +95,6 @@ func (l List) String() (str string) {
 // Len returns length of list
 func (l *List) Len(num int) int {
 	length := num
-	if IsAtom(l.cdr) {
-		return length
-	}
 	list, ok := l.cdr.(List)
 	if !ok {
 		// TODO should return error
