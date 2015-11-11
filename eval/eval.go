@@ -59,6 +59,10 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 		case "if":
 		case "cond":
 		case "lambda":
+			if len(t) < 3 {
+				return nil, errors.New("lambda must have more than 3 words.")
+			}
+			return types.Lambda{t[1], t[2]}, nil
 		case "begin":
 		default:
 		}
