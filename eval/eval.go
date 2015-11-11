@@ -57,7 +57,18 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 				return tt[0], nil
 			}
 		case "if":
+			// like, (if (ok? yeah) (go) (not go))
+			b, err := Eval(t[1], env)
+			if err != nil {
+				return nil, err
+			}
+			if b {
+				return Eval(t[2], env)
+			} else {
+				return Eval(t[3], env)
+			}
 		case "cond":
+			// TODO transform and use if evaluation here, too.
 		case "lambda":
 			if len(t) < 3 {
 				return nil, errors.New("lambda must have more than 3 words.")
@@ -71,10 +82,6 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 		return nil, errors.New("unkonwn expression type")
 	}
 	return nil, nil
-}
-
-// DefineVariable defines variable-value pairs to environments
-func DefineVariable() {
 }
 
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
