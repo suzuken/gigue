@@ -27,25 +27,25 @@ func (b Boolean) String() string {
 // Env is scheme environment for evaluation
 type Env struct {
 	*sync.RWMutex
-	m      map[Symbol]*Expression // m is symbol table for expression
-	parent *Env                   // parent is parent Environment. Env is nested.
+	m      map[Symbol]Expression // m is symbol table for expression
+	parent *Env                  // parent is parent Environment. Env is nested.
 }
 
 // NewEnv creates new environment
 func NewEnv() *Env {
-	symbols := make(map[Symbol]*Expression) // TODO: more flexible stack size control
+	symbols := make(map[Symbol]Expression) // TODO: more flexible stack size control
 	return &Env{m: symbols}
 }
 
 // Put creates new symbol to table
-func (e *Env) Put(s Symbol, exp *Expression) {
+func (e *Env) Put(s Symbol, exp Expression) {
 	e.Lock()
 	defer e.Unlock()
 	e.m[s] = exp
 }
 
 // Get fetch expression by symbol from environment
-func (e *Env) Get(s Symbol) (*Expression, error) {
+func (e *Env) Get(s Symbol) (Expression, error) {
 	e.RLock()
 	defer e.RUnlock()
 	v, ok := e.m[s]
@@ -101,4 +101,12 @@ func (l *List) Len(num int) int {
 		return length
 	}
 	return list.Len(length + 1)
+}
+
+// Lambda is definition of lambda
+type Lambda struct {
+	// Args are temporary parameters
+	Args Expression
+	// Body is expression to evalute
+	Body Expression
 }

@@ -28,6 +28,34 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 		}
 		switch car {
 		case "define":
+			if len(t) < 2 {
+				return nil, errors.New("define clause must have symbol and body.")
+			}
+			// TODO consider if simply Eval(t[2], env) and put it into env.
+			// because []types.Expression should be evaluated by Eval() anyway.
+			switch tt := t[1].(type) {
+			// put symbol and variables
+			// (define x 1) style definition
+			case types.Symbol:
+				value, err := Eval(t[2], env)
+				if err != nil {
+					return nil, err
+				}
+				env.Put(tt, value)
+				return tt, nil
+			// (define (hoge args) (..)) style definition
+			case []types.Expression:
+				if len(tt) < 2 {
+					return nil, errors.New("define statament must have more than 2 words.")
+				}
+				caddr, ok := tt[0].(types.Symbol)
+				if !ok {
+					return nil, errors.New("(define x) of x should be symbol..")
+				}
+				// create lambda and put it into environment
+				env.Put(caddr, types.Lambda{tt[0], t[2]})
+				return tt[0], nil
+			}
 		case "if":
 		case "cond":
 		case "lambda":
@@ -39,6 +67,10 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 		return nil, errors.New("unkonwn expression type")
 	}
 	return nil, nil
+}
+
+// DefineVariable defines variable-value pairs to environments
+func DefineVariable() {
 }
 
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
