@@ -6,7 +6,7 @@ import (
 )
 
 // S is S-expression
-type S interface{}
+type Expression interface{}
 
 // Number is number of scheme. (based on Go float64)
 type Number float64
@@ -27,25 +27,25 @@ func (b Boolean) String() string {
 // Env is scheme environment for evaluation
 type Env struct {
 	*sync.RWMutex
-	m      map[Symbol]*S // m is symbol table for expression
-	parent *Env          // parent is parent Environment. Env is nested.
+	m      map[Symbol]*Expression // m is symbol table for expression
+	parent *Env                   // parent is parent Environment. Env is nested.
 }
 
 // NewEnv creates new environment
 func NewEnv() *Env {
-	symbols := make(map[Symbol]*S) // TODO: more flexible stack size control
+	symbols := make(map[Symbol]*Expression) // TODO: more flexible stack size control
 	return &Env{m: symbols}
 }
 
 // Put creates new symbol to table
-func (e *Env) Put(s Symbol, exp *S) {
+func (e *Env) Put(s Symbol, exp *Expression) {
 	e.Lock()
 	defer e.Unlock()
 	e.m[s] = exp
 }
 
 // Get fetch expression by symbol from environment
-func (e *Env) Get(s Symbol) (*S, error) {
+func (e *Env) Get(s Symbol) (*Expression, error) {
 	e.RLock()
 	defer e.RUnlock()
 	v, ok := e.m[s]
@@ -65,12 +65,12 @@ func (e *Env) Remove(s Symbol) {
 
 // Pair is cons
 type Pair struct {
-	car S
-	cdr S
+	Car Expression
+	Cdr Expression
 }
 
 func (p *Pair) String() string {
-	return fmt.Sprintf("(%s . %s)", p.car, p.cdr)
+	return fmt.Sprintf("(%s . %s)", p.Car, p.Cdr)
 }
 
 // List is list of scheme
@@ -81,12 +81,12 @@ type List struct {
 func (l List) String() (str string) {
 	// TODO implementation
 	str = str + "("
-	if l.car == nil {
+	if l.Car == nil {
 		str = str + ")"
 		return str
 	} else {
 		// l.cdr is list
-		str = str + fmt.Sprint(l.cdr)
+		str = str + fmt.Sprint(l.Cdr)
 		return str
 	}
 	return str
@@ -95,7 +95,7 @@ func (l List) String() (str string) {
 // Len returns length of list
 func (l *List) Len(num int) int {
 	length := num
-	list, ok := l.cdr.(List)
+	list, ok := l.Cdr.(List)
 	if !ok {
 		// TODO should return error
 		return length
