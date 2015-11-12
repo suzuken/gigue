@@ -44,20 +44,28 @@ func (lex *Lex) Scan() (tokens Tokens, err error) {
 	// start s-expression
 	if lex.Token == '(' {
 		lex.NextToken()
-		// recursive scan
-		ts, err := lex.Scan()
-		if err != nil {
-			return tokens, err
+		// recursive scan until ')'
+		for {
+			switch lex.Token {
+			case ')':
+				return tokens, nil
+			default:
+				ts, err := lex.Scan()
+				if err != nil {
+					return tokens, err
+				}
+				for _, t := range ts {
+					tokens = append(tokens, t)
+				}
+			}
 		}
-		for _, t := range ts {
-			tokens = append(tokens, t)
-		}
-		if lex.Token != ')' {
-			return tokens, fmt.Errorf("')' is expected but get other one. failed. token: %s", lex.TokenText())
-		}
-		return tokens, nil
 	} else if lex.Token == ')' {
 		return tokens, errors.New("unexpected ')'")
+	} else {
+		tokens = append(tokens, lex.TokenText())
+		lex.NextToken()
+		return tokens, nil
 	}
+	tokens = append(tokens, lex.TokenText())
 	return tokens, nil
 }
