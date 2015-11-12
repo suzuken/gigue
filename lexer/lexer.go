@@ -3,6 +3,7 @@ package lexer
 import (
 	"errors"
 	"fmt"
+	"github.com/suzuken/gs/types"
 	"io"
 	"text/scanner"
 )
@@ -37,10 +38,8 @@ func (lex *Lex) Error(msg string) error {
 	return fmt.Errorf("%s: %v", msg, lex.Token)
 }
 
-type Tokens []string
-
 // Scan starts scan the whole program and return tokens
-func (lex *Lex) Scan() (tokens Tokens, err error) {
+func (lex *Lex) Scan() (exps []types.Expression, err error) {
 	// start s-expression
 	if lex.Token == '(' {
 		lex.NextToken()
@@ -48,24 +47,24 @@ func (lex *Lex) Scan() (tokens Tokens, err error) {
 		for {
 			switch lex.Token {
 			case ')':
-				return tokens, nil
+				return exps, nil
 			default:
 				ts, err := lex.Scan()
 				if err != nil {
-					return tokens, err
+					return exps, err
 				}
 				for _, t := range ts {
-					tokens = append(tokens, t)
+					exps = append(exps, t)
 				}
 			}
 		}
 	} else if lex.Token == ')' {
-		return tokens, errors.New("unexpected ')'")
+		return exps, errors.New("unexpected ')'")
 	} else {
-		tokens = append(tokens, lex.TokenText())
+		exps = append(exps, lex.TokenText())
 		lex.NextToken()
-		return tokens, nil
+		return exps, nil
 	}
-	tokens = append(tokens, lex.TokenText())
-	return tokens, nil
+	exps = append(exps, lex.TokenText())
+	return exps, nil
 }
