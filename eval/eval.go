@@ -62,7 +62,11 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 			if err != nil {
 				return nil, err
 			}
-			if b {
+			bb, ok := b.(types.Boolean)
+			if !ok {
+				return nil, errors.New("if-predicate should return types.Boolean")
+			}
+			if bb {
 				return Eval(t[2], env)
 			} else {
 				return Eval(t[3], env)
@@ -75,6 +79,16 @@ func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
 			}
 			return types.Lambda{t[1], t[2]}, nil
 		case "begin":
+			// (begin s1 s2 ... last)
+			var lastExp types.Expression
+			for _, beginExp := range t[1:] {
+				l, err := Eval(beginExp, env)
+				if err != nil {
+					return nil, err
+				}
+				lastExp = l
+			}
+			return lastExp, nil
 		default:
 		}
 	default:
