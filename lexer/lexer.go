@@ -38,11 +38,6 @@ func (lex *Lex) Error(msg string) error {
 	return fmt.Errorf("%s: %v", msg, lex.Token)
 }
 
-// Zero returns 0 value of big.Rat
-func Zero() *big.Rat {
-	return big.NewRat(0, 0)
-}
-
 type Tokens []string
 
 // Scan starts scan the whole program and return tokens
@@ -64,11 +59,6 @@ func (lex *Lex) Scan() (tokens Tokens, err error) {
 		return tokens, nil
 	} else if lex.Token == ')' {
 		return tokens, errors.New("unexpected ')'")
-	} else {
-		// switch lex.Token {
-		// case '#t':
-		// return tokens
-		// }
 	}
 	return tokens, nil
 }
