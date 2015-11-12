@@ -39,32 +39,30 @@ func (lex *Lex) Error(msg string) error {
 }
 
 // Scan starts scan the whole program and return tokens
-func (lex *Lex) Scan() (exps []types.Expression, err error) {
+func (lex *Lex) Scan() (exps types.Expression, err error) {
 	// start s-expression
 	if lex.Token == '(' {
+		var list []types.Expression
 		lex.NextToken()
 		// recursive scan until ')'
+	LOOP:
 		for {
 			switch lex.Token {
 			case ')':
-				return exps, nil
+				break LOOP
 			default:
 				ts, err := lex.Scan()
 				if err != nil {
 					return exps, err
 				}
-				for _, t := range ts {
-					exps = append(exps, t)
-				}
+				lex.NextToken()
+				list = append(list, ts)
 			}
 		}
+		return list, nil
 	} else if lex.Token == ')' {
 		return exps, errors.New("unexpected ')'")
 	} else {
-		exps = append(exps, lex.TokenText())
-		lex.NextToken()
-		return exps, nil
+		return lex.TokenText(), nil
 	}
-	exps = append(exps, lex.TokenText())
-	return exps, nil
 }
