@@ -6,7 +6,7 @@ import (
 )
 
 // Eval is body of evaluator
-func Eval(exp types.Expression, env *types.Env) (types.Expression, error) {
+func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	switch t := exp.(type) {
 	case types.Boolean:
 		return exp, nil
@@ -118,17 +118,17 @@ func ProcedureParameters(p types.Expression) (exps []types.Expression) {
 	return exps
 }
 
-func ProcedureEnvironment(p types.Expression) *types.Env {
+func ProcedureEnvironment(p types.Expression) *Env {
 	return nil
 }
 
-func ExtendEnvironment(exps, args []types.Expression, env *types.Env) *types.Env {
+func ExtendEnvironment(exps, args []types.Expression, env *Env) *Env {
 	return nil
 }
 
 // EvalSeauencd evaluate sequence of expressions in certain environment.
 // Return is last expression.
-func EvalSequence(exps []types.Expression, env *types.Env) (types.Expression, error) {
+func EvalSequence(exps []types.Expression, env *Env) (types.Expression, error) {
 	if len(exps) == 1 {
 		return Eval(exps[0], env)
 	}
@@ -140,7 +140,7 @@ func EvalSequence(exps []types.Expression, env *types.Env) (types.Expression, er
 }
 
 // listOfValues returns arguments for evaluator.
-func listOfValues(exps []types.Expression, env *types.Env) (types.Expression, error) {
+func listOfValues(exps []types.Expression, env *Env) (types.Expression, error) {
 	if len(exps) <= 0 {
 		return nil, nil
 	}

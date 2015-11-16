@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"sync"
 )
 
 // S is S-expression
@@ -22,45 +21,6 @@ func (b Boolean) String() string {
 		return "#t"
 	}
 	return "#f"
-}
-
-// Env is scheme environment for evaluation
-type Env struct {
-	*sync.RWMutex
-	m      map[Symbol]Expression // m is symbol table for expression
-	parent *Env                  // parent is parent Environment. Env is nested.
-}
-
-// NewEnv creates new environment
-func NewEnv() *Env {
-	symbols := make(map[Symbol]Expression) // TODO: more flexible stack size control
-	return &Env{m: symbols}
-}
-
-// Put creates new symbol to table
-func (e *Env) Put(s Symbol, exp Expression) {
-	e.Lock()
-	defer e.Unlock()
-	e.m[s] = exp
-}
-
-// Get fetch expression by symbol from environment
-func (e *Env) Get(s Symbol) (Expression, error) {
-	e.RLock()
-	defer e.RUnlock()
-	v, ok := e.m[s]
-	if !ok {
-		// or return nil?
-		return nil, fmt.Errorf("symbol not found from the environment: symbol %s", s)
-	}
-	return v, nil
-}
-
-// Remove symbol from environment
-func (e *Env) Remove(s Symbol) {
-	e.Lock()
-	defer e.Unlock()
-	delete(e.m, s)
 }
 
 // Pair is cons
