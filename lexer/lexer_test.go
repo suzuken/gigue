@@ -1,8 +1,6 @@
 package lexer
 
 import (
-	"github.com/suzuken/gs/types"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -10,43 +8,21 @@ import (
 func TestLex(t *testing.T) {
 	lex := New()
 	r := strings.NewReader("(print 1)")
-	actual := []types.Expression{
-		"print",
-		"1",
-	}
 	lex.Init(r)
-	lex.NextToken()
-	tokens, err := lex.Scan()
-	if err != nil {
-		t.Fatalf("lexer failed: %s", err)
+	lex.Scan()
+	if lex.TokenText() != "(" {
+		t.Fatalf("first string is ( but %s", lex.TokenText())
 	}
-	if !reflect.DeepEqual(tokens, actual) {
-		t.Fatalf("tokens is not expected. %v", tokens)
+	lex.Scan()
+	if lex.TokenText() != "print" {
+		t.Fatalf("second string is print but %s", lex.TokenText())
 	}
-}
-
-func TestLexRecursive(t *testing.T) {
-	lex := New()
-	r := strings.NewReader("(define (square x) (* x x))")
-	expected := []types.Expression{
-		"define",
-		[]types.Expression{
-			"square",
-			"x",
-		},
-		[]types.Expression{
-			"*",
-			"x",
-			"x",
-		},
+	lex.Scan()
+	if lex.TokenText() != "1" {
+		t.Fatalf("third string is print but %s", lex.TokenText())
 	}
-	lex.Init(r)
-	lex.NextToken()
-	tokens, err := lex.Scan()
-	if err != nil {
-		t.Fatalf("lexer failed: %s", err)
-	}
-	if !reflect.DeepEqual(tokens, expected) {
-		t.Fatalf("tokens is not expected. %v", tokens)
+	lex.Scan()
+	if lex.TokenText() != ")" {
+		t.Fatalf("forth string is print but %s", lex.TokenText())
 	}
 }
