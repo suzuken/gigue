@@ -20,17 +20,17 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	// start s-expression
 	if p.lex.TokenText() == "(" {
 		var list []types.Expression
-		p.lex.Scan()
 		// recursive scan until ')'
-	LOOP:
 		for {
-			switch p.lex.TokenText() {
-			case ")":
-				break LOOP
-			default:
-				p.lex.Scan()
-				list = append(list, p.lex.TokenText())
+			p.lex.Scan()
+			if p.lex.TokenText() == ")" {
+				break
 			}
+			ex, err := p.Parse()
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, ex)
 		}
 		return list, nil
 	} else if p.lex.TokenText() == ")" {

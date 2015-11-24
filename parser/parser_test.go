@@ -12,6 +12,7 @@ func TestParser(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(print 1)")
 	lex.Init(r)
+	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		"print",
@@ -30,6 +31,7 @@ func TestParserRecursive(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(define (square x) (* x x))")
 	lex.Init(r)
+	lex.Scan()
 
 	parser := New(lex)
 	expected := []types.Expression{
