@@ -11,7 +11,7 @@ type Frame map[types.Symbol]types.Expression
 
 // Env is scheme environment for evaluation
 type Env struct {
-	*sync.RWMutex
+	sync.RWMutex
 	m      Frame // m is symbol table for expression
 	parent *Env  // parent is parent Environment. Env is nested.
 }
@@ -19,7 +19,7 @@ type Env struct {
 // NewEnv creates new environment
 func NewEnv() *Env {
 	symbols := make(Frame) // TODO: more flexible stack size control
-	return &Env{m: symbols}
+	return &Env{m: symbols, parent: nil}
 }
 
 // Extend extends environments by given variables and values.

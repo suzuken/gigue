@@ -93,7 +93,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		}
 	default:
 		// not found any known operands. failed.
-		return nil, errors.New("unkonwn expression type")
+		return nil, errors.New("unknown expression type")
 	}
 	return nil, nil
 }
