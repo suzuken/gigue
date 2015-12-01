@@ -90,6 +90,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 			return lastExp, nil
 		default:
+			// TODO implement. apply?
 		}
 	default:
 		// not found any known operands. failed.

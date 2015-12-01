@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/suzuken/gs/lexer"
 	"github.com/suzuken/gs/types"
+	"strconv"
 )
 
 type Parser struct {
@@ -36,6 +37,21 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	} else if p.lex.TokenText() == ")" {
 		return exps, errors.New("unexpected ')'")
 	} else {
-		return p.lex.TokenText(), nil
+		token := p.lex.TokenText()
+		if token == "#" {
+			p.lex.Scan()
+			if t := p.lex.TokenText(); t == "t" {
+				return types.Boolean(true), nil
+			} else if t == "f" {
+				return types.Boolean(false), nil
+			} else {
+				return types.Symbol(token + t), nil
+			}
+		}
+		// try conversion to float. if failed, deal with symbol.
+		if n, err := strconv.ParseFloat(token, 64); err == nil {
+			return types.Number(n), nil
+		}
+		return types.Symbol(token), nil
 	}
 }
