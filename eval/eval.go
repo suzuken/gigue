@@ -90,7 +90,23 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 			return lastExp, nil
 		default:
-			// TODO implement. apply?
+			exps := make([]types.Expression, 0)
+			for _, operand := range t[1:] {
+				exp, err := Eval(operand, env)
+				if err != nil {
+					return nil, err
+				}
+				exps = append(exps, exp)
+			}
+			fn, err := Eval(car, env)
+			if err != nil {
+				return nil, err
+			}
+			result, err := Apply(fn, exps)
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
 		}
 	default:
 		// not found any known operands. failed.
@@ -100,31 +116,14 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 }
 
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
-func Apply(p *types.Expression, args []types.Expression) (*types.Expression, error) {
-	if primitiveProcedure(p) {
-		ApplyPrimitiveProcedure(p, args)
-	} else if compoundProcedure(p) {
-		EvalSequence(ProcedureBody(p), ExtendEnvironment(ProcedureParameters(p), args, ProcedureEnvironment(p)))
-	} else {
+func Apply(procedure types.Expression, args []types.Expression) (types.Expression, error) {
+	switch p := procedure.(type) {
+	case func(...types.Expression) types.Expression:
+		return p(args), nil
+	default:
 		return nil, errors.New("Unknown procedure type")
 	}
 	return nil, nil
-}
-
-func ProcedureBody(p types.Expression) (exps []types.Expression) {
-	return exps
-}
-
-func ProcedureParameters(p types.Expression) (exps []types.Expression) {
-	return exps
-}
-
-func ProcedureEnvironment(p types.Expression) *Env {
-	return nil
-}
-
-func ExtendEnvironment(exps, args []types.Expression, env *Env) *Env {
-	return nil
 }
 
 // EvalSeauencd evaluate sequence of expressions in certain environment.
@@ -156,16 +155,4 @@ func listOfValues(exps []types.Expression, env *Env) (types.Expression, error) {
 		return nil, err
 	}
 	return types.Pair{first, rest}, nil
-}
-
-func primitiveProcedure(s *types.Expression) bool {
-	return false
-}
-
-func compoundProcedure(s *types.Expression) bool {
-	return false
-}
-
-func ApplyPrimitiveProcedure(p *types.Expression, args []types.Expression) (*types.Expression, error) {
-	return nil, nil
 }

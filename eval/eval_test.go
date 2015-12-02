@@ -11,7 +11,7 @@ func TestEval(t *testing.T) {
 
 	exp := []types.Expression{
 		types.Symbol("print"),
-		types.Symbol("1"),
+		types.Number(1),
 	}
 
 	r, err := Eval(exp, env)
