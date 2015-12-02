@@ -9,9 +9,9 @@ import (
 func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	switch t := exp.(type) {
 	case types.Boolean:
-		return exp, nil
+		return t, nil
 	case types.Number:
-		return exp, nil
+		return t, nil
 	case types.Symbol:
 		// it's variable. get value from environment
 		e, err := env.Get(t)
@@ -90,6 +90,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 			return lastExp, nil
 		default:
+			// extend environment
 			exps := make([]types.Expression, 0)
 			for _, operand := range t[1:] {
 				exp, err := Eval(operand, env)
@@ -98,6 +99,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 				}
 				exps = append(exps, exp)
 			}
+			// maybe, it is primitive procedure or compound procedure.
 			fn, err := Eval(car, env)
 			if err != nil {
 				return nil, err
@@ -118,8 +120,9 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
 func Apply(procedure types.Expression, args []types.Expression) (types.Expression, error) {
 	switch p := procedure.(type) {
-	case func(...types.Expression) types.Expression:
-		return p(args), nil
+	case func(...types.Expression) (types.Expression, error):
+		// primitive procedure
+		return p(args...)
 	default:
 		return nil, errors.New("Unknown procedure type")
 	}

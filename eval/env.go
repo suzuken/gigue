@@ -54,69 +54,81 @@ func NewPrimitiveProcedureFrame() Frame {
 }
 
 // Car is implementation of car
-func Car(args ...types.Expression) types.Expression {
-	return args[0]
+func Car(args ...types.Expression) (types.Expression, error) {
+	return args[0], nil
 }
 
-func Cdr(args ...types.Expression) types.Expression {
-	return args[1:]
+func Cdr(args ...types.Expression) (types.Expression, error) {
+	return args[1:], nil
 }
 
-func Cons(args ...types.Expression) types.Expression {
-	return types.Pair{args[0], args[1]}
+func Cons(args ...types.Expression) (types.Expression, error) {
+	return types.Pair{args[0], args[1]}, nil
 }
 
-func Print(args ...types.Expression) types.Expression {
+func Print(args ...types.Expression) (types.Expression, error) {
 	fmt.Print(args)
-	return nil
+	return nil, nil
 }
 
-func Add(args ...types.Expression) types.Expression {
-	sum := args[0].(types.Number)
+func Add(args ...types.Expression) (types.Expression, error) {
+	sum, ok := args[0].(types.Number)
+	if !ok {
+		return nil, fmt.Errorf("given args is not number: %#v", args[0])
+	}
 	for _, adder := range args[1:] {
 		sum = sum + adder.(types.Number)
 	}
-	return sum
+	return sum, nil
 }
 
-func Subtract(args ...types.Expression) types.Expression {
-	sub := args[0].(types.Number)
+func Subtract(args ...types.Expression) (types.Expression, error) {
+	sub, ok := args[0].(types.Number)
+	if !ok {
+		return nil, fmt.Errorf("given args is not number: %v", args[0])
+	}
 	for _, s := range args[1:] {
 		sub = sub - s.(types.Number)
 	}
-	return sub
+	return sub, nil
 }
 
-func Multiply(args ...types.Expression) types.Expression {
-	mul := args[0].(types.Number)
+func Multiply(args ...types.Expression) (types.Expression, error) {
+	mul, ok := args[0].(types.Number)
+	if !ok {
+		return nil, fmt.Errorf("given args is not number: %v", args[0])
+	}
 	for _, m := range args[1:] {
 		mul = mul * m.(types.Number)
 	}
-	return mul
+	return mul, nil
 }
 
-func Divide(args ...types.Expression) types.Expression {
-	div := args[0].(types.Number)
+func Divide(args ...types.Expression) (types.Expression, error) {
+	div, ok := args[0].(types.Number)
+	if !ok {
+		return nil, fmt.Errorf("given args is not number: %v", args[0])
+	}
 	for _, d := range args[1:] {
 		div = div / d.(types.Number)
 	}
-	return div
+	return div, nil
 }
 
-func GreaterThan(args ...types.Expression) types.Expression {
-	return types.Boolean(args[0].(types.Number) > args[1].(types.Number))
+func GreaterThan(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0].(types.Number) > args[1].(types.Number)), nil
 }
 
-func LessThan(args ...types.Expression) types.Expression {
-	return types.Boolean(args[0].(types.Number) < args[1].(types.Number))
+func LessThan(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0].(types.Number) < args[1].(types.Number)), nil
 }
 
-func IsEqual(args ...types.Expression) types.Expression {
-	return types.Boolean(args[0] == args[1])
+func IsEqual(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0] == args[1]), nil
 }
 
-func IsNull(args ...types.Expression) types.Expression {
-	return types.Boolean(args[0] == nil)
+func IsNull(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0] == nil), nil
 }
 
 // Put creates new symbol to table

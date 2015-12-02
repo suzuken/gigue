@@ -55,7 +55,7 @@ func main() {
 }
 
 func showEval(exp types.Expression) {
-	fmt.Printf("%v", exp)
+	fmt.Printf("%v\n", exp)
 }
 
 func ev(r io.Reader, env *eval.Env) (types.Expression, error) {
