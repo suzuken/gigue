@@ -156,3 +156,13 @@ func (e *Env) Remove(s types.Symbol) {
 	defer e.Unlock()
 	delete(e.m, s)
 }
+
+// Lambda is definition of lambda
+type Lambda struct {
+	// Args are temporary parameters
+	Args types.Expression
+	// Body is expression to evalute
+	Body types.Expression
+	// Env is environent for evaluate this lambda function
+	Env *Env
+}

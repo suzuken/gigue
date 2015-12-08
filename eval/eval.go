@@ -53,7 +53,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 					return nil, errors.New("(define x) of x should be symbol..")
 				}
 				// create lambda and put it into environment
-				env.Put(caddr, types.Lambda{tt[0], t[2]})
+				env.Put(caddr, Lambda{tt[1:], t[2], env})
 				return tt[0], nil
 			}
 		case "if":
@@ -77,7 +77,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			if len(t) < 3 {
 				return nil, errors.New("lambda must have more than 3 words.")
 			}
-			return types.Lambda{t[1], t[2]}, nil
+			return Lambda{t[1], t[2], env}, nil
 		case "begin":
 			// (begin s1 s2 ... last)
 			var lastExp types.Expression
@@ -120,6 +120,25 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
 func Apply(procedure types.Expression, args []types.Expression) (types.Expression, error) {
 	switch p := procedure.(type) {
+	case Lambda:
+		// extend environment base on lambda arguments
+		// should bind argument to this environment.
+		// for example, (define (sum x y) (+ x y)) and given (sum 1 2),
+		// then creates frames which have x = 1 and y = 2.
+		env := &Env{m: make(Frame), parent: p.Env}
+		env.Setup()
+		switch lambdaArgs := p.Args.(type) {
+		case []types.Expression:
+			if len(lambdaArgs) != len(args) {
+				return nil, errors.New("given args is not match with lambda args")
+			}
+			for i, arg := range lambdaArgs {
+				env.Put(arg.(types.Symbol), args[i])
+			}
+		default:
+			env.Put(lambdaArgs.(types.Symbol), lambdaArgs)
+		}
+		return Eval(p.Body, env)
 	case func(...types.Expression) (types.Expression, error):
 		// primitive procedure
 		return p(args...)

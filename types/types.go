@@ -62,11 +62,3 @@ func (l *List) Len(num int) int {
 	}
 	return list.Len(length + 1)
 }
-
-// Lambda is definition of lambda
-type Lambda struct {
-	// Args are temporary parameters
-	Args Expression
-	// Body is expression to evalute
-	Body Expression
-}

@@ -76,3 +76,41 @@ func TestEvalDefineAndCaliculation(t *testing.T) {
 		t.Fatalf("given x = 1, (+ x 3 (* 5 (- 5 2))) should equal 19 but get: %v", r)
 	}
 }
+
+func TestEvalDefineFunction(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	// (define (sum x y) (+ x y))
+	if _, err := Eval([]types.Expression{
+		types.Symbol("define"),
+		[]types.Expression{
+			types.Symbol("sum"),
+			types.Symbol("x"),
+			types.Symbol("y"),
+		},
+		[]types.Expression{
+			types.Symbol("+"),
+			types.Symbol("x"),
+			types.Symbol("y"),
+		},
+	}, env); err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+
+	// (sum 1 2)
+	exp := []types.Expression{
+		types.Symbol("sum"),
+		types.Number(1),
+		types.Number(2),
+	}
+
+	r, err := Eval(exp, env)
+	if err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+
+	if r != types.Number(3) {
+		t.Fatalf("given (sum 1 2) should equal 3 but get: %v", r)
+	}
+}
