@@ -5,6 +5,7 @@ import (
 	"github.com/suzuken/gs/lexer"
 	"github.com/suzuken/gs/types"
 	"strconv"
+	"text/scanner"
 )
 
 type Parser struct {
@@ -19,12 +20,12 @@ func New(lex *lexer.Lex) *Parser {
 // Parse scans given tokens and return it into expression.
 func (p *Parser) Parse() (exps types.Expression, err error) {
 	// start s-expression
-	if p.lex.TokenText() == "(" {
+	if p.lex.Token == '(' {
 		var list []types.Expression
 		// recursive scan until ')'
 		for {
 			p.lex.Scan()
-			if p.lex.TokenText() == ")" {
+			if p.lex.Token == ')' {
 				break
 			}
 			ex, err := p.Parse()
@@ -34,9 +35,17 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 			list = append(list, ex)
 		}
 		return list, nil
-	} else if p.lex.TokenText() == ")" {
+	} else if p.lex.Token == ')' {
 		return exps, errors.New("unexpected ')'")
 	} else {
+		if p.lex.Token == scanner.String {
+			t, err := strconv.Unquote(p.lex.TokenText())
+			if err != nil {
+				return nil, err
+			}
+			return types.String(t), nil
+		}
+
 		token := p.lex.TokenText()
 		if token == "#" {
 			p.lex.Scan()

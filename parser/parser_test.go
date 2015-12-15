@@ -73,3 +73,22 @@ func TestParseBoolean(t *testing.T) {
 		t.Fatalf("expressions is not expected. %v", exps)
 	}
 }
+
+func TestParseString(t *testing.T) {
+	lex := lexer.New()
+	r := strings.NewReader("(print \"it's test\")")
+	lex.Init(r)
+	lex.Scan()
+	parser := New(lex)
+	actual := []types.Expression{
+		types.Symbol("print"),
+		types.String("it's test"),
+	}
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %#v", exps)
+	}
+}
