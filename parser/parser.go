@@ -2,10 +2,13 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"github.com/suzuken/gs/lexer"
 	"github.com/suzuken/gs/types"
 	"strconv"
+	"strings"
 	"text/scanner"
+	"unicode"
 )
 
 type Parser struct {
@@ -60,6 +63,16 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 		// try conversion to float. if failed, deal with symbol.
 		if n, err := strconv.ParseFloat(token, 64); err == nil {
 			return types.Number(n), nil
+		}
+
+		// concatenate tokens for symbol until end of characters.
+		for {
+			r := p.lex.Peek()
+			if unicode.IsSpace(r) || strings.ContainsRune("()'.,;", r) || r == scanner.EOF {
+				break
+			}
+			token = fmt.Sprintf("%s%c", token, r)
+			p.lex.Next()
 		}
 		return types.Symbol(token), nil
 	}

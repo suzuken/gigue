@@ -92,3 +92,23 @@ func TestParseString(t *testing.T) {
 		t.Fatalf("expressions is not expected. %#v", exps)
 	}
 }
+
+func TestParseDash(t *testing.T) {
+	lex := lexer.New()
+	r := strings.NewReader("(define a-b-c-efg x)")
+	lex.Init(r)
+	lex.Scan()
+	parser := New(lex)
+	actual := []types.Expression{
+		types.Symbol("define"),
+		types.Symbol("a-b-c-efg"),
+		types.Symbol("x"),
+	}
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %#v", exps)
+	}
+}
