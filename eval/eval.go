@@ -8,9 +8,7 @@ import (
 // Eval is body of evaluator
 func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	switch t := exp.(type) {
-	case types.Boolean:
-		return t, nil
-	case types.Number:
+	case types.Boolean, types.Number, types.String:
 		return t, nil
 	case types.Symbol:
 		// it's variable. get value from environment
