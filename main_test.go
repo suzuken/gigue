@@ -31,9 +31,10 @@ func visit(t *testing.T) filepath.WalkFunc {
 		env := eval.NewEnv()
 		env.Setup()
 		if _, err := evalFile(path, env); err != nil {
-			t.Fatalf("eval file failed. file: %s, err: %s", f.Name(), err)
+			t.Fatalf("eval file failed. file: %s, err: %s", path, err)
 			return err
 		}
+		t.Logf("eval file success: file: %s", path)
 		return nil
 	}
 }
