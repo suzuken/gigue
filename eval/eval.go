@@ -40,7 +40,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 					return nil, err
 				}
 				env.Put(tt, value)
-				return tt, nil
+				return nil, nil
 			// (define (hoge args) (..)) style definition
 			case []types.Expression:
 				if len(tt) < 2 {
@@ -52,7 +52,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 				}
 				// create lambda and put it into environment
 				env.Put(caddr, Lambda{tt[1:], t[2], env})
-				return tt[0], nil
+				return nil, nil
 			}
 		case "if":
 			// like, (if (ok? yeah) (go) (not go))

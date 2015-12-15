@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"text/scanner"
 )
 
 func main() {
@@ -38,18 +39,18 @@ func main() {
 			}
 		}
 	} else {
-		exp, err := evalFile(flag.Arg(0), env)
-		if err != nil {
+		if _, err := evalFile(flag.Arg(0), env); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
-		output(exp)
 	}
 }
 
 // output simply output results.
 func output(exp types.Expression) {
-	fmt.Printf("%v\n", exp)
+	if exp != nil {
+		fmt.Printf("%v\n", exp)
+	}
 }
 
 func evalFile(filename string, env *eval.Env) (types.Expression, error) {
@@ -61,14 +62,23 @@ func evalFile(filename string, env *eval.Env) (types.Expression, error) {
 	return ev(f, env)
 }
 
+// ev evaluate scheme program from io.Reader
 func ev(r io.Reader, env *eval.Env) (types.Expression, error) {
 	l := lexer.New()
 	l.Init(r)
 	l.Scan()
 	p := parser.New(l)
-	exps, err := p.Parse()
-	if err != nil {
-		return nil, err
+	for l.Token != scanner.EOF {
+		// fmt.Println(l.TokenText())
+		exps, err := p.Parse()
+		if err != nil {
+			return nil, err
+		}
+		// fmt.Printf("%#v\n", exps)
+		if _, err := eval.Eval(exps, env); err != nil {
+			return nil, err
+		}
+		l.Scan()
 	}
-	return eval.Eval(exps, env)
+	return nil, nil
 }

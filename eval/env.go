@@ -50,6 +50,7 @@ func NewPrimitiveProcedureFrame() Frame {
 		"<":     LessThan,
 		"eq?":   IsEqual,
 		"null?": IsNull,
+		"list":  List,
 	}
 }
 
@@ -129,6 +130,10 @@ func IsEqual(args ...types.Expression) (types.Expression, error) {
 
 func IsNull(args ...types.Expression) (types.Expression, error) {
 	return types.Boolean(args[0] == nil), nil
+}
+
+func List(args ...types.Expression) (types.Expression, error) {
+	return args, nil
 }
 
 // Put creates new symbol to table
