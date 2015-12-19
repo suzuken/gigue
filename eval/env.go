@@ -1,6 +1,7 @@
 package eval
 
 import (
+	"errors"
 	"fmt"
 	"github.com/suzuken/gs/types"
 	"sync"
@@ -49,18 +50,29 @@ func NewPrimitiveProcedureFrame() Frame {
 		">":     GreaterThan,
 		"<":     LessThan,
 		"eq?":   IsEqual,
+		"=":     IsEqual,
 		"null?": IsNull,
 		"list":  List,
+		"list?": IsList,
 	}
 }
 
 // Car is implementation of car
 func Car(args ...types.Expression) (types.Expression, error) {
-	return args[0], nil
+	a, ok := args[0].(*types.Pair)
+	if !ok {
+		return nil, errors.New("arguments of car should pair")
+	}
+	return a.Car, nil
 }
 
+// Cdr is cdr
 func Cdr(args ...types.Expression) (types.Expression, error) {
-	return args[1:], nil
+	a, ok := args[0].(*types.Pair)
+	if !ok {
+		return nil, errors.New("arguments of cdr should pair")
+	}
+	return a.Cdr, nil
 }
 
 func Cons(args ...types.Expression) (types.Expression, error) {
@@ -133,11 +145,23 @@ func IsEqual(args ...types.Expression) (types.Expression, error) {
 }
 
 func IsNull(args ...types.Expression) (types.Expression, error) {
-	return types.Boolean(args[0] == nil), nil
+	pair, ok := args[0].(*types.Pair)
+	if !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(pair.IsNull()), nil
 }
 
 func List(args ...types.Expression) (types.Expression, error) {
-	return args, nil
+	return types.NewList(args...), nil
+}
+
+func IsList(args ...types.Expression) (types.Expression, error) {
+	pair, ok := args[0].(types.Pair)
+	if !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(pair.IsList()), nil
 }
 
 // Put creates new symbol to table
@@ -153,6 +177,9 @@ func (e *Env) Get(s types.Symbol) (types.Expression, error) {
 	defer e.RUnlock()
 	v, ok := e.m[s]
 	if !ok {
+		if e.parent != nil {
+			return e.parent.Get(s)
+		}
 		// or return nil?
 		return nil, fmt.Errorf("symbol not found from the environment: symbol %s", s)
 	}

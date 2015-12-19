@@ -112,3 +112,71 @@ func TestParseDash(t *testing.T) {
 		t.Fatalf("expressions is not expected. %#v", exps)
 	}
 }
+
+func TestParseLineDelimited(t *testing.T) {
+	lex := lexer.New()
+	r := strings.NewReader(`
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1)) (fib (- n 2))))))
+	`)
+	lex.Init(r)
+	lex.Scan()
+	parser := New(lex)
+	actual := []types.Expression{
+		types.Symbol("define"),
+		[]types.Expression{
+			types.Symbol("fib"),
+			types.Symbol("n"),
+		},
+		[]types.Expression{
+			types.Symbol("cond"),
+			[]types.Expression{
+				[]types.Expression{
+					types.Symbol("="),
+					types.Symbol("n"),
+					types.Number(0),
+				},
+				types.Number(0),
+			},
+			[]types.Expression{
+				[]types.Expression{
+					types.Symbol("="),
+					types.Symbol("n"),
+					types.Number(1),
+				},
+				types.Number(1),
+			},
+			[]types.Expression{
+				types.Symbol("else"),
+				[]types.Expression{
+					types.Symbol("+"),
+					[]types.Expression{
+						types.Symbol("fib"),
+						[]types.Expression{
+							types.Symbol("-"),
+							types.Symbol("n"),
+							types.Number(1),
+						},
+					},
+					[]types.Expression{
+						types.Symbol("fib"),
+						[]types.Expression{
+							types.Symbol("-"),
+							types.Symbol("n"),
+							types.Number(2),
+						},
+					},
+				},
+			},
+		},
+	}
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %#v", exps)
+	}
+}

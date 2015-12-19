@@ -36,32 +36,53 @@ func (p *Pair) String() string {
 	return fmt.Sprintf("(%s . %s)", p.Car, p.Cdr)
 }
 
-// List is list of scheme
-type List struct {
-	*Pair
+func (p *Pair) IsNull() bool {
+	return p.Car == nil && p.Cdr == nil
 }
 
-func (l List) String() (str string) {
-	// TODO implementation
-	str = str + "("
-	if l.Car == nil {
-		str = str + ")"
-		return str
-	} else {
-		// l.cdr is list
-		str = str + fmt.Sprint(l.Cdr)
-		return str
-	}
-	return str
+func (p *Pair) IsPair() bool {
+	return !p.IsNull()
 }
 
-// Len returns length of list
-func (l *List) Len(num int) int {
-	length := num
-	list, ok := l.Cdr.(List)
-	if !ok {
-		// TODO should return error
-		return length
+// IsList returns if pair is list or not.
+//
+// * empty pair is list
+// * end of list should be empty pair (empty list)
+func (p *Pair) IsList() bool {
+	pp := p
+	for {
+		if pp.IsNull() {
+			return true
+		}
+		switch cdr := pp.Cdr.(type) {
+		case *Pair:
+			pp = cdr
+		default:
+			return false
+		}
 	}
-	return list.Len(length + 1)
+	return false
+}
+
+// Append add cons to given pair
+func (p *Pair) Append(exp Expression) *Pair {
+	// append exp to tail
+	pp := p
+	for {
+		if pp.IsNull() {
+			break
+		}
+		pp = pp.Cdr.(*Pair)
+	}
+	pp.Car = exp
+	pp.Cdr = &Pair{}
+	return pp
+}
+
+func NewList(args ...Expression) *Pair {
+	p := &Pair{Car: nil, Cdr: nil}
+	for _, arg := range args {
+		p.Append(arg)
+	}
+	return p
 }

@@ -11,7 +11,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	case types.Boolean, types.Number, types.String:
 		return t, nil
 	case types.Symbol:
-		// it's variable. get value from environment
+		// it's variable or expression. get value from environment
 		e, err := env.Get(t)
 		if err != nil {
 			return nil, err
@@ -51,6 +51,8 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 					return nil, errors.New("(define x) of x should be symbol..")
 				}
 				// create lambda and put it into environment
+				// TODO verify if it's own func name is certainly put into environment.
+				// it's necessary for evaluating recursive function.
 				env.Put(caddr, Lambda{tt[1:], t[2], env})
 				return nil, nil
 			}
@@ -71,6 +73,24 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 		case "cond":
 			// TODO transform and use if evaluation here, too.
+			// precision
+			for _, operand := range t[1:] {
+				tt, ok := operand.([]types.Expression)
+				if !ok {
+					return nil, errors.New("cond clause must have expression")
+				}
+				if tt[0] == types.Symbol("else") {
+					return Eval(tt[1], env)
+				}
+				b, err := Eval(tt[0], env)
+				if err != nil {
+					return nil, err
+				}
+				bb, ok := b.(types.Boolean)
+				if ok && bb == true {
+					return Eval(tt[1], env)
+				}
+			}
 		case "lambda":
 			if len(t) < 3 {
 				return nil, errors.New("lambda must have more than 3 words.")
@@ -144,35 +164,4 @@ func Apply(procedure types.Expression, args []types.Expression) (types.Expressio
 		return nil, errors.New("Unknown procedure type")
 	}
 	return nil, nil
-}
-
-// EvalSeauencd evaluate sequence of expressions in certain environment.
-// Return is last expression.
-func EvalSequence(exps []types.Expression, env *Env) (types.Expression, error) {
-	if len(exps) == 1 {
-		return Eval(exps[0], env)
-	}
-	// making environment (Yes, it's pointer)
-	if _, err := Eval(exps[0], env); err != nil {
-		return nil, err
-	}
-	return EvalSequence(exps[1:], env)
-}
-
-// listOfValues returns arguments for evaluator.
-func listOfValues(exps []types.Expression, env *Env) (types.Expression, error) {
-	if len(exps) <= 0 {
-		return nil, nil
-	}
-	// evaluate exps one by one on each environment
-	first, err := Eval(exps[0], env)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: should use for in Go way?
-	rest, err := listOfValues(exps[1:], env)
-	if err != nil {
-		return nil, err
-	}
-	return types.Pair{first, rest}, nil
 }
