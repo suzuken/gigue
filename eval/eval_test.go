@@ -218,18 +218,18 @@ func TestPrimitiveListOperation(t *testing.T) {
 		t.Fatal("cannot get car")
 	}
 
-	cdr, err := Eval([]types.Expression{
+	cdrExp, err := Eval([]types.Expression{
 		types.Symbol("cdr"),
 		types.Symbol("x"),
 	}, env)
 	if err != nil {
 		t.Fatalf("eval error: %s", err)
 	}
-	list, ok := cdr.([]types.Expression)
+	cdr, ok := cdrExp.(*types.Pair)
 	if !ok {
-		t.Fatal("cdr should be list but not")
+		t.Fatal("cdr should be pair but not")
 	}
-	if list[0] != types.Number(2) {
+	if cdr.Car != types.Number(2) {
 		t.Fatal("cannot get cdr")
 	}
 }

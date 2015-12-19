@@ -53,25 +53,26 @@ func NewPrimitiveProcedureFrame() Frame {
 		"=":     IsEqual,
 		"null?": IsNull,
 		"list":  List,
+		"list?": IsList,
 	}
 }
 
 // Car is implementation of car
 func Car(args ...types.Expression) (types.Expression, error) {
-	a, ok := args[0].([]types.Expression)
+	a, ok := args[0].(*types.Pair)
 	if !ok {
 		return nil, errors.New("arguments of car should pair")
 	}
-	return a[0], nil
+	return a.Car, nil
 }
 
 // Cdr is cdr
 func Cdr(args ...types.Expression) (types.Expression, error) {
-	a, ok := args[0].([]types.Expression)
+	a, ok := args[0].(*types.Pair)
 	if !ok {
 		return nil, errors.New("arguments of cdr should pair")
 	}
-	return a[1:], nil
+	return a.Cdr, nil
 }
 
 func Cons(args ...types.Expression) (types.Expression, error) {
@@ -144,11 +145,23 @@ func IsEqual(args ...types.Expression) (types.Expression, error) {
 }
 
 func IsNull(args ...types.Expression) (types.Expression, error) {
-	return types.Boolean(args[0] == nil), nil
+	pair, ok := args[0].(types.Pair)
+	if !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(pair.IsNull()), nil
 }
 
 func List(args ...types.Expression) (types.Expression, error) {
-	return args, nil
+	return types.NewList(args...), nil
+}
+
+func IsList(args ...types.Expression) (types.Expression, error) {
+	pair, ok := args[0].(types.Pair)
+	if !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(pair.IsList()), nil
 }
 
 // Put creates new symbol to table

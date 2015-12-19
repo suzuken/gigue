@@ -12,3 +12,6 @@ func TestNewEnv(t *testing.T) {
 		t.Fatalf("cannot find car from primitive environments: %s", err)
 	}
 }
+
+func TestPair(t *testing.T) {
+}
