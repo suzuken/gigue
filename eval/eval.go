@@ -165,34 +165,3 @@ func Apply(procedure types.Expression, args []types.Expression) (types.Expressio
 	}
 	return nil, nil
 }
-
-// EvalSeauencd evaluate sequence of expressions in certain environment.
-// Return is last expression.
-func EvalSequence(exps []types.Expression, env *Env) (types.Expression, error) {
-	if len(exps) == 1 {
-		return Eval(exps[0], env)
-	}
-	// making environment (Yes, it's pointer)
-	if _, err := Eval(exps[0], env); err != nil {
-		return nil, err
-	}
-	return EvalSequence(exps[1:], env)
-}
-
-// listOfValues returns arguments for evaluator.
-func listOfValues(exps []types.Expression, env *Env) (types.Expression, error) {
-	if len(exps) <= 0 {
-		return nil, nil
-	}
-	// evaluate exps one by one on each environment
-	first, err := Eval(exps[0], env)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: should use for in Go way?
-	rest, err := listOfValues(exps[1:], env)
-	if err != nil {
-		return nil, err
-	}
-	return types.Pair{first, rest}, nil
-}
