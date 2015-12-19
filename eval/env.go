@@ -145,7 +145,7 @@ func IsEqual(args ...types.Expression) (types.Expression, error) {
 }
 
 func IsNull(args ...types.Expression) (types.Expression, error) {
-	pair, ok := args[0].(types.Pair)
+	pair, ok := args[0].(*types.Pair)
 	if !ok {
 		return types.Boolean(false), nil
 	}

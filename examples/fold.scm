@@ -12,5 +12,5 @@
               (cdr rest))))
     (iter initial sequence))
 
-(print (fold-right / 1 (list 1 2 3))) ; 3/2
-(print (fold-left / 1 (list 1 2 3))) ; 1/6
+(print (fold-right / 1 (list 1 2 3)))
+(print (fold-left / 1 (list 1 2 3)))
