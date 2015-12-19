@@ -114,3 +114,77 @@ func TestEvalDefineFunction(t *testing.T) {
 		t.Fatalf("given (sum 1 2) should equal 3 but get: %v", r)
 	}
 }
+
+func TestEvalRecursiveFunction(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	// (define (fib n)
+	//   (cond ((= n 0) 0)
+	//         ((= n 1) 1)
+	//         (else (+ (fib (- n 1)) (fib (- n 2))))))
+	if _, err := Eval([]types.Expression{
+		types.Symbol("define"),
+		[]types.Expression{
+			types.Symbol("fib"),
+			types.Symbol("n"),
+		},
+		[]types.Expression{
+			types.Symbol("cond"),
+			[]types.Expression{
+				[]types.Expression{
+					types.Symbol("="),
+					types.Symbol("n"),
+					types.Number(0),
+				},
+				types.Number(0),
+			},
+			[]types.Expression{
+				[]types.Expression{
+					types.Symbol("="),
+					types.Symbol("n"),
+					types.Number(1),
+				},
+				types.Number(1),
+			},
+			[]types.Expression{
+				types.Symbol("else"),
+				[]types.Expression{
+					types.Symbol("+"),
+					[]types.Expression{
+						types.Symbol("fib"),
+						[]types.Expression{
+							types.Symbol("-"),
+							types.Symbol("n"),
+							types.Number(1),
+						},
+					},
+					[]types.Expression{
+						types.Symbol("fib"),
+						[]types.Expression{
+							types.Symbol("-"),
+							types.Symbol("n"),
+							types.Number(2),
+						},
+					},
+				},
+			},
+		},
+	}, env); err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+
+	exp := []types.Expression{
+		types.Symbol("fib"),
+		types.Number(10),
+	}
+
+	r, err := Eval(exp, env)
+	if err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+
+	if r != types.Number(55) {
+		t.Fatalf("given (fib 10) should equal 55 but get: %v", r)
+	}
+}

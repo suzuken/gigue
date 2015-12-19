@@ -49,6 +49,7 @@ func NewPrimitiveProcedureFrame() Frame {
 		">":     GreaterThan,
 		"<":     LessThan,
 		"eq?":   IsEqual,
+		"=":     IsEqual,
 		"null?": IsNull,
 		"list":  List,
 	}

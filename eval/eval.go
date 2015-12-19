@@ -71,6 +71,24 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 		case "cond":
 			// TODO transform and use if evaluation here, too.
+			// precision
+			for _, operand := range t[1:] {
+				tt, ok := operand.([]types.Expression)
+				if !ok {
+					return nil, errors.New("cond clause must have expression")
+				}
+				if tt[0] == types.Symbol("else") {
+					return Eval(tt[1], env)
+				}
+				b, err := Eval(tt[0], env)
+				if err != nil {
+					return nil, err
+				}
+				bb, ok := b.(types.Boolean)
+				if ok && bb == true {
+					return Eval(tt[1], env)
+				}
+			}
 		case "lambda":
 			if len(t) < 3 {
 				return nil, errors.New("lambda must have more than 3 words.")
