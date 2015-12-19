@@ -68,7 +68,11 @@ func Cons(args ...types.Expression) (types.Expression, error) {
 }
 
 func Print(args ...types.Expression) (types.Expression, error) {
-	fmt.Print(args)
+	if len(args) == 1 {
+		fmt.Println(args[0])
+	} else {
+		fmt.Println(args)
+	}
 	return nil, nil
 }
 
