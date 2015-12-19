@@ -181,7 +181,7 @@ func TestEvalRecursiveFunction(t *testing.T) {
 
 	r, err := Eval(exp, env)
 	if err != nil {
-		t.Fatalf("eval but error : %s", err)
+		t.Fatalf("eval but error : %s, env: %v", err, env)
 	}
 
 	if r != types.Number(55) {

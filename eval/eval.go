@@ -11,7 +11,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	case types.Boolean, types.Number, types.String:
 		return t, nil
 	case types.Symbol:
-		// it's variable. get value from environment
+		// it's variable or expression. get value from environment
 		e, err := env.Get(t)
 		if err != nil {
 			return nil, err
@@ -51,6 +51,8 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 					return nil, errors.New("(define x) of x should be symbol..")
 				}
 				// create lambda and put it into environment
+				// TODO verify if it's own func name is certainly put into environment.
+				// it's necessary for evaluating recursive function.
 				env.Put(caddr, Lambda{tt[1:], t[2], env})
 				return nil, nil
 			}

@@ -154,6 +154,9 @@ func (e *Env) Get(s types.Symbol) (types.Expression, error) {
 	defer e.RUnlock()
 	v, ok := e.m[s]
 	if !ok {
+		if e.parent != nil {
+			return e.parent.Get(s)
+		}
 		// or return nil?
 		return nil, fmt.Errorf("symbol not found from the environment: symbol %s", s)
 	}
