@@ -188,3 +188,48 @@ func TestEvalRecursiveFunction(t *testing.T) {
 		t.Fatalf("given (fib 10) should equal 55 but get: %v", r)
 	}
 }
+
+func TestPrimitiveListOperation(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	// (define x (list 1 2 3))
+	if _, err := Eval([]types.Expression{
+		types.Symbol("define"),
+		types.Symbol("x"),
+		[]types.Expression{
+			types.Symbol("list"),
+			types.Number(1),
+			types.Number(2),
+			types.Number(3),
+		},
+	}, env); err != nil {
+		t.Fatalf("eval error: %s", err)
+	}
+
+	car, err := Eval([]types.Expression{
+		types.Symbol("car"),
+		types.Symbol("x"),
+	}, env)
+	if err != nil {
+		t.Fatalf("eval error: %s", err)
+	}
+	if car != types.Number(1) {
+		t.Fatal("cannot get car")
+	}
+
+	cdr, err := Eval([]types.Expression{
+		types.Symbol("cdr"),
+		types.Symbol("x"),
+	}, env)
+	if err != nil {
+		t.Fatalf("eval error: %s", err)
+	}
+	list, ok := cdr.([]types.Expression)
+	if !ok {
+		t.Fatal("cdr should be list but not")
+	}
+	if list[0] != types.Number(2) {
+		t.Fatal("cannot get cdr")
+	}
+}

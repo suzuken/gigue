@@ -1,6 +1,7 @@
 package eval
 
 import (
+	"errors"
 	"fmt"
 	"github.com/suzuken/gs/types"
 	"sync"
@@ -57,11 +58,20 @@ func NewPrimitiveProcedureFrame() Frame {
 
 // Car is implementation of car
 func Car(args ...types.Expression) (types.Expression, error) {
-	return args[0], nil
+	a, ok := args[0].([]types.Expression)
+	if !ok {
+		return nil, errors.New("arguments of car should pair")
+	}
+	return a[0], nil
 }
 
+// Cdr is cdr
 func Cdr(args ...types.Expression) (types.Expression, error) {
-	return args[1:], nil
+	a, ok := args[0].([]types.Expression)
+	if !ok {
+		return nil, errors.New("arguments of cdr should pair")
+	}
+	return a[1:], nil
 }
 
 func Cons(args ...types.Expression) (types.Expression, error) {
