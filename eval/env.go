@@ -3,7 +3,7 @@ package eval
 import (
 	"errors"
 	"fmt"
-	"github.com/suzuken/gs/types"
+	"github.com/suzuken/gigue/types"
 	"sync"
 )
 

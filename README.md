@@ -1,8 +1,8 @@
-# GS
+# Gigue
 
-[![Build Status](https://travis-ci.org/suzuken/gs.svg)](https://travis-ci.org/suzuken/gs)
+[![Build Status](https://travis-ci.org/suzuken/gigue.svg)](https://travis-ci.org/suzuken/gigue)
 
-GS is experimental implementation of scheme interpriter written in Go.
+Gigue is experimental implementation of scheme interpriter written in Go.
 
 ## LICENSE
 

@@ -3,8 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"github.com/suzuken/gs/lexer"
-	"github.com/suzuken/gs/types"
+	"github.com/suzuken/gigue/lexer"
+	"github.com/suzuken/gigue/types"
 	"strconv"
 	"strings"
 	"text/scanner"

@@ -2,9 +2,9 @@ package eval
 
 import (
 	"errors"
-	"github.com/suzuken/gs/lexer"
-	"github.com/suzuken/gs/parser"
-	"github.com/suzuken/gs/types"
+	"github.com/suzuken/gigue/lexer"
+	"github.com/suzuken/gigue/parser"
+	"github.com/suzuken/gigue/types"
 	"io"
 	"os"
 	"path/filepath"

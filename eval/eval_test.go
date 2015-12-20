@@ -1,7 +1,7 @@
 package eval
 
 import (
-	"github.com/suzuken/gs/types"
+	"github.com/suzuken/gigue/types"
 	"os"
 	"path/filepath"
 	"strings"

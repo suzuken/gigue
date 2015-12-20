@@ -5,8 +5,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/suzuken/gs/eval"
-	"github.com/suzuken/gs/types"
+	"github.com/suzuken/gigue/eval"
+	"github.com/suzuken/gigue/types"
 	"os"
 	"strings"
 )
