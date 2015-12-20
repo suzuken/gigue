@@ -6,13 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/suzuken/gs/eval"
-	"github.com/suzuken/gs/lexer"
-	"github.com/suzuken/gs/parser"
 	"github.com/suzuken/gs/types"
-	"io"
 	"os"
 	"strings"
-	"text/scanner"
 )
 
 func main() {
@@ -31,7 +27,7 @@ func main() {
 			if input == "exit\n" {
 				return
 			}
-			exp, err := ev(strings.NewReader(input), env)
+			exp, err := eval.EvalReader(strings.NewReader(input), env)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "eval error: %s\n", err)
 			} else {
@@ -39,7 +35,7 @@ func main() {
 			}
 		}
 	} else {
-		if _, err := evalFile(flag.Arg(0), env); err != nil {
+		if _, err := eval.EvalFile(flag.Arg(0), env); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
@@ -51,34 +47,4 @@ func output(exp types.Expression) {
 	if exp != nil {
 		fmt.Printf("%v\n", exp)
 	}
-}
-
-func evalFile(filename string, env *eval.Env) (types.Expression, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return ev(f, env)
-}
-
-// ev evaluate scheme program from io.Reader
-func ev(r io.Reader, env *eval.Env) (types.Expression, error) {
-	l := lexer.New()
-	l.Init(r)
-	l.Scan()
-	p := parser.New(l)
-	for l.Token != scanner.EOF {
-		// fmt.Println(l.TokenText())
-		exps, err := p.Parse()
-		if err != nil {
-			return nil, err
-		}
-		// fmt.Printf("%#v\n", exps)
-		if _, err := eval.Eval(exps, env); err != nil {
-			return nil, err
-		}
-		l.Scan()
-	}
-	return nil, nil
 }

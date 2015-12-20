@@ -2,7 +2,13 @@ package eval
 
 import (
 	"errors"
+	"github.com/suzuken/gs/lexer"
+	"github.com/suzuken/gs/parser"
 	"github.com/suzuken/gs/types"
+	"io"
+	"os"
+	"path/filepath"
+	"text/scanner"
 )
 
 // Eval is body of evaluator
@@ -72,8 +78,6 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 				return Eval(t[3], env)
 			}
 		case "cond":
-			// TODO transform and use if evaluation here, too.
-			// precision
 			for _, operand := range t[1:] {
 				tt, ok := operand.([]types.Expression)
 				if !ok {
@@ -107,6 +111,18 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 				lastExp = l
 			}
 			return lastExp, nil
+		case "load":
+			// (load "file.scm") loading file and evaluate it.
+			path, ok := t[1].(string)
+			if !ok {
+				return nil, errors.New("args of load should be string.")
+			}
+			abs, err := filepath.Abs(path)
+			if err != nil {
+				return nil, err
+			}
+			// evaluate file in given environment.
+			return EvalFile(abs, env)
 		default:
 			// extend environment
 			exps := make([]types.Expression, 0)
@@ -131,6 +147,35 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	default:
 		// not found any known operands. failed.
 		return nil, errors.New("unknown expression type")
+	}
+	return nil, nil
+}
+
+// EvalFile evaluate given file
+func EvalFile(filename string, env *Env) (types.Expression, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return EvalReader(f, env)
+}
+
+// ev evaluate scheme program from io.Reader
+func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
+	l := lexer.New()
+	l.Init(r)
+	l.Scan()
+	p := parser.New(l)
+	for l.Token != scanner.EOF {
+		exps, err := p.Parse()
+		if err != nil {
+			return nil, err
+		}
+		if _, err := Eval(exps, env); err != nil {
+			return nil, err
+		}
+		l.Scan()
 	}
 	return nil, nil
 }

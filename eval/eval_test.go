@@ -2,6 +2,9 @@ package eval
 
 import (
 	"github.com/suzuken/gs/types"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -231,5 +234,44 @@ func TestPrimitiveListOperation(t *testing.T) {
 	}
 	if cdr.Car != types.Number(2) {
 		t.Fatal("cannot get cdr")
+	}
+}
+
+func TestEvalReader(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	r := strings.NewReader(`
+(define x 1)
+(print x)
+	`)
+	if _, err := EvalReader(r, env); err != nil {
+		t.Fatalf("eval error read from io.Reader: %s", err)
+	}
+}
+
+// visit generate WalkFunc for traversing examples directory.
+func visit(t *testing.T) filepath.WalkFunc {
+	return func(path string, f os.FileInfo, err error) error {
+		// skip directory
+		if f.IsDir() {
+			return nil
+		}
+		env := NewEnv()
+		env.Setup()
+		if _, err := EvalFile(path, env); err != nil {
+			t.Fatalf("eval file failed. file: %s, err: %s\nenv: %#v", path, err, env)
+			return err
+		}
+		t.Logf("eval file success: file: %s", path)
+		return nil
+	}
+}
+
+// TestExecute execute scheme scripts under examples in actual.
+// simply check if cause error or not.
+func TestExecute(t *testing.T) {
+	if err := filepath.Walk("../examples", visit(t)); err != nil {
+		t.Fatalf("eval file failed: %s", err)
 	}
 }
