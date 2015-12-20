@@ -61,7 +61,6 @@ func (p *Pair) IsList() bool {
 			return false
 		}
 	}
-	return false
 }
 
 // Append add cons to given pair

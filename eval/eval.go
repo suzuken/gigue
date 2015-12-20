@@ -163,5 +163,4 @@ func Apply(procedure types.Expression, args []types.Expression) (types.Expressio
 	default:
 		return nil, errors.New("Unknown procedure type")
 	}
-	return nil, nil
 }
