@@ -177,7 +177,6 @@ func EvalFile(filename string, env *Env) (types.Expression, error) {
 func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	l := lexer.New()
 	l.Init(r)
-	l.Scan()
 	p := parser.New(l)
 	if _, err := env.Get("#current-load-path"); err != nil {
 		env.Put("#current-load-path", "#f")
@@ -190,7 +189,6 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 		if _, err := Eval(exps, env); err != nil {
 			return nil, err
 		}
-		l.Scan()
 	}
 	return nil, nil
 }

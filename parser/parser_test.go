@@ -12,7 +12,6 @@ func TestParser(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(print 1)")
 	lex.Init(r)
-	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("print"),
@@ -31,8 +30,6 @@ func TestParserRecursive(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(define (square x) (* x x))")
 	lex.Init(r)
-	lex.Scan()
-
 	parser := New(lex)
 	expected := []types.Expression{
 		types.Symbol("define"),
@@ -51,7 +48,7 @@ func TestParserRecursive(t *testing.T) {
 		t.Fatalf("parser failed: %s", err)
 	}
 	if !reflect.DeepEqual(exps, expected) {
-		t.Fatalf("expressions is not expected. %v", exps)
+		t.Fatalf("expressions is not expected. %#v", exps)
 	}
 }
 
@@ -59,7 +56,6 @@ func TestParseBoolean(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(print #t)")
 	lex.Init(r)
-	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("print"),
@@ -70,7 +66,7 @@ func TestParseBoolean(t *testing.T) {
 		t.Fatalf("parser failed: %s", err)
 	}
 	if !reflect.DeepEqual(exps, actual) {
-		t.Fatalf("expressions is not expected. %v", exps)
+		t.Fatalf("expressions is not expected. %#v", exps)
 	}
 }
 
@@ -78,7 +74,6 @@ func TestParseString(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(print \"it's test\")")
 	lex.Init(r)
-	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("print"),
@@ -97,7 +92,6 @@ func TestParseDash(t *testing.T) {
 	lex := lexer.New()
 	r := strings.NewReader("(define a-b-c-efg x)")
 	lex.Init(r)
-	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("define"),
@@ -122,7 +116,6 @@ func TestParseLineDelimited(t *testing.T) {
         (else (+ (fib (- n 1)) (fib (- n 2))))))
 	`)
 	lex.Init(r)
-	lex.Scan()
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("define"),
@@ -178,5 +171,23 @@ func TestParseLineDelimited(t *testing.T) {
 	}
 	if !reflect.DeepEqual(exps, actual) {
 		t.Fatalf("expressions is not expected. %#v", exps)
+	}
+}
+
+func TestNewLine(t *testing.T) {
+	lex := lexer.New()
+	r := strings.NewReader("(print 1)\n\n")
+	lex.Init(r)
+	parser := New(lex)
+	actual := []types.Expression{
+		types.Symbol("print"),
+		types.Number(1),
+	}
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %v", exps)
 	}
 }
