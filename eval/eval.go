@@ -8,13 +8,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/scanner"
 )
 
 // Eval is body of evaluator
 func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	switch t := exp.(type) {
-	case types.Boolean, types.Number, types.String:
+	case types.Boolean, types.Number, string:
 		return t, nil
 	case types.Symbol:
 		// it's variable or expression. get value from environment
@@ -112,7 +113,20 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			// (load "file.scm") loading file and evaluate it.
 			path, ok := t[1].(string)
 			if !ok {
-				return nil, errors.New("args of load should be string.")
+				return nil, errors.New("args of load should be symbol.")
+			}
+			exp, err := env.Get("#current-load-path")
+			// path is empty
+			if err != nil {
+				return nil, err
+			}
+			// if path is set, search from current directory
+			if p := exp.(string); p != "" {
+				// if path start with /, deal as absolute path
+				// if not, deal as relative path
+				if !strings.HasPrefix(path, "/") {
+					path = filepath.Join(filepath.Dir(p), path)
+				}
 			}
 			abs, err := filepath.Abs(path)
 			if err != nil {
@@ -154,6 +168,7 @@ func EvalFile(filename string, env *Env) (types.Expression, error) {
 	if err != nil {
 		return nil, err
 	}
+	env.Put("#current-load-path", filename)
 	defer f.Close()
 	return EvalReader(f, env)
 }

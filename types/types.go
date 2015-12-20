@@ -16,9 +16,6 @@ type Symbol string
 // Boolean is boolean of scheme.
 type Boolean bool
 
-// String is string of scheme.
-type String string
-
 func (b Boolean) String() string {
 	if b {
 		return "#t"

@@ -82,7 +82,7 @@ func TestParseString(t *testing.T) {
 	parser := New(lex)
 	actual := []types.Expression{
 		types.Symbol("print"),
-		types.String("it's test"),
+		"it's test",
 	}
 	exps, err := parser.Parse()
 	if err != nil {

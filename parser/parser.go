@@ -46,7 +46,7 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 			if err != nil {
 				return nil, err
 			}
-			return types.String(t), nil
+			return t, nil
 		}
 
 		token := p.lex.TokenText()
