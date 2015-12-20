@@ -179,6 +179,9 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	l.Init(r)
 	l.Scan()
 	p := parser.New(l)
+	if _, err := env.Get("#current-load-path"); err != nil {
+		env.Put("#current-load-path", "#f")
+	}
 	for l.Token != scanner.EOF {
 		exps, err := p.Parse()
 		if err != nil {
