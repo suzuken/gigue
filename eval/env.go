@@ -36,7 +36,7 @@ func (e *Env) Setup() {
 }
 
 // NewPrimitiveProcedureFrame returns frame of primitive procedures.
-// GS provides functionality of base scheme procedure.
+// Gigue provides functionality of base scheme procedure.
 func NewPrimitiveProcedureFrame() Frame {
 	return Frame{
 		"car":   Car,
