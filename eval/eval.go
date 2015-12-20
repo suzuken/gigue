@@ -35,8 +35,6 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			if len(t) < 2 {
 				return nil, errors.New("define clause must have symbol and body.")
 			}
-			// TODO consider if simply Eval(t[2], env) and put it into env.
-			// because []types.Expression should be evaluated by Eval() anyway.
 			switch tt := t[1].(type) {
 			// put symbol and variables
 			// (define x 1) style definition
@@ -48,6 +46,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 				env.Put(tt, value)
 				return nil, nil
 			// (define (hoge args) (..)) style definition
+			// above style is syntax sugar for lambda.
 			case []types.Expression:
 				if len(tt) < 2 {
 					return nil, errors.New("define statament must have more than 2 words.")
@@ -57,8 +56,6 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 					return nil, errors.New("(define x) of x should be symbol..")
 				}
 				// create lambda and put it into environment
-				// TODO verify if it's own func name is certainly put into environment.
-				// it's necessary for evaluating recursive function.
 				env.Put(caddr, Lambda{tt[1:], t[2], env})
 				return nil, nil
 			}
