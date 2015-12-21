@@ -9,10 +9,8 @@ import (
 )
 
 func TestParser(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(print 1)")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("print"),
 		types.Number(1),
@@ -27,10 +25,8 @@ func TestParser(t *testing.T) {
 }
 
 func TestParserRecursive(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(define (square x) (* x x))")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	expected := []types.Expression{
 		types.Symbol("define"),
 		[]types.Expression{
@@ -53,10 +49,8 @@ func TestParserRecursive(t *testing.T) {
 }
 
 func TestParseBoolean(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(print #t)")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("print"),
 		types.Boolean(true),
@@ -71,10 +65,8 @@ func TestParseBoolean(t *testing.T) {
 }
 
 func TestParseString(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(print \"it's test\")")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("print"),
 		"it's test",
@@ -89,10 +81,8 @@ func TestParseString(t *testing.T) {
 }
 
 func TestParseDash(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(define a-b-c-efg x)")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("define"),
 		types.Symbol("a-b-c-efg"),
@@ -108,15 +98,13 @@ func TestParseDash(t *testing.T) {
 }
 
 func TestParseLineDelimited(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader(`
 (define (fib n)
   (cond ((= n 0) 0)
         ((= n 1) 1)
         (else (+ (fib (- n 1)) (fib (- n 2))))))
 	`)
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("define"),
 		[]types.Expression{
@@ -175,10 +163,8 @@ func TestParseLineDelimited(t *testing.T) {
 }
 
 func TestNewLine(t *testing.T) {
-	lex := lexer.New()
 	r := strings.NewReader("(print 1)\n\n")
-	lex.Init(r)
-	parser := New(lex)
+	parser := New(lexer.New(r))
 	actual := []types.Expression{
 		types.Symbol("print"),
 		types.Number(1),

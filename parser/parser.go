@@ -22,8 +22,6 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println(token)
-
 	// start s-expression
 	if token == "(" {
 		var list []types.Expression

@@ -17,12 +17,11 @@ type Lex struct {
 }
 
 // New returns new lexer
-func New() *Lex {
+func New(r io.Reader) *Lex {
 	var s scanner.Scanner
+	s.Init(r)
 	// only scan characters. implement lexer myself.
-	// s.Mode &^= scanner.ScanChars | scanner.ScanRawStrings
-	s.Mode &^= scanner.ScanChars
-	// s.Mode &^= scanner.ScanRawStrings
+	s.Mode &^= scanner.ScanChars | scanner.ScanRawStrings
 	return &Lex{
 		Scanner: &s,
 	}
@@ -42,8 +41,11 @@ func (l *Lex) Next() (string, error) {
 		default:
 			return "", errors.New("unknown hash symbol")
 		}
-	case '(', ')':
+	case '(', ')', '\'', scanner.EOF:
 		return l.TokenText(), nil
+	case '\n', '\r', '\t', ' ':
+		l.Scan()
+		return l.Next()
 	default:
 		// concatenate tokens for symbol until end of characters.
 		token := l.TokenText()
@@ -76,11 +78,6 @@ func (l *Lex) TokenAll() (tokens []string, err error) {
 		tokens = append(tokens, token)
 	}
 	return
-}
-
-// Init initialize lexer
-func (l *Lex) Init(r io.Reader) {
-	l.Scanner.Init(r)
 }
 
 // Scan makes scan

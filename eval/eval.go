@@ -175,8 +175,7 @@ func EvalFile(filename string, env *Env) (types.Expression, error) {
 
 // ev evaluate scheme program from io.Reader
 func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
-	l := lexer.New()
-	l.Init(r)
+	l := lexer.New(r)
 	p := parser.New(l)
 	if _, err := env.Get("#current-load-path"); err != nil {
 		env.Put("#current-load-path", "#f")

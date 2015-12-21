@@ -6,9 +6,7 @@ import (
 )
 
 func TestLex(t *testing.T) {
-	lex := New()
-	r := strings.NewReader("(print 1)")
-	lex.Init(r)
+	lex := New(strings.NewReader("(print 1)"))
 	lex.Scan()
 	if lex.TokenText() != "(" {
 		t.Fatalf("first string is ( but %s", lex.TokenText())
@@ -43,8 +41,7 @@ func verifyTokens(t *testing.T, x, y []string) bool {
 
 // verifyTokenAll is useful method for testing given string how lexical analysis is works.
 func verifyTokenAll(t *testing.T, given string, expected string) {
-	lex := New()
-	lex.Init(strings.NewReader(given))
+	lex := New(strings.NewReader(given))
 	tokens, err := lex.TokenAll()
 	if err != nil {
 		t.Fatalf("lexer failed: %s", err)
@@ -55,5 +52,8 @@ func verifyTokenAll(t *testing.T, given string, expected string) {
 func TestLexDefine(t *testing.T) {
 	verifyTokenAll(t, "(print 1)", "(,print,1,)")
 	verifyTokenAll(t, "(print \"test\")", "(,print,\"test\",)")
-	verifyTokenAll(t, "(print\n1)\n\n", "(,print,1,),")
+	verifyTokenAll(t, "-100", "-100")
+	verifyTokenAll(t, "(print 'hoge)", "(,print,',hoge,)")
+	verifyTokenAll(t, "(print\n1)\n", "(,print,1,),")
+	verifyTokenAll(t, "(define x 1)\n(print x)", "(,define,x,1,),(,print,x,)")
 }
