@@ -78,7 +78,7 @@ func Cdr(args ...types.Expression) (types.Expression, error) {
 }
 
 func Cons(args ...types.Expression) (types.Expression, error) {
-	return types.Pair{Car: args[0], Cdr: args[1]}, nil
+	return &types.Pair{Car: args[0], Cdr: args[1]}, nil
 }
 
 func Print(args ...types.Expression) (types.Expression, error) {
