@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/scanner"
 )
 
 // Eval is body of evaluator
@@ -180,14 +179,12 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	if _, err := env.Get("#current-load-path"); err != nil {
 		env.Put("#current-load-path", "#f")
 	}
-	for l.Token != scanner.EOF {
-		exps, err := p.Parse()
-		if err != nil {
-			return nil, err
-		}
-		if _, err := Eval(exps, env); err != nil {
-			return nil, err
-		}
+	exps, err := p.Parse()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := Eval(exps, env); err != nil {
+		return nil, err
 	}
 	return nil, nil
 }
