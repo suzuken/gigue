@@ -248,6 +248,13 @@ func TestEvalReader(t *testing.T) {
 	if _, err := EvalReader(r, env); err != nil {
 		t.Fatalf("eval error read from io.Reader: %s", err)
 	}
+	exp, err := env.Get("x")
+	if err != nil {
+		t.Fatalf("get x failed: %s", err)
+	}
+	if exp != types.Number(1) {
+		t.Fatal("x should 1 but not")
+	}
 }
 
 // visit generate WalkFunc for traversing examples directory.
