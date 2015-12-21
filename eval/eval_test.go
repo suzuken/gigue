@@ -243,17 +243,20 @@ func TestEvalReader(t *testing.T) {
 
 	r := strings.NewReader(`
 (define x 1)
+(define y 2)
+(define (sum x y) (+ x y))
+(define z (sum x y))
 (print x)
 `)
 	if _, err := EvalReader(r, env); err != nil {
 		t.Fatalf("eval error read from io.Reader: %s", err)
 	}
-	exp, err := env.Get("x")
+	exp, err := env.Get("z")
 	if err != nil {
-		t.Fatalf("get x failed: %s", err)
+		t.Fatalf("get z failed: env: %#v err: %s", env, err)
 	}
-	if exp != types.Number(1) {
-		t.Fatal("x should 1 but not")
+	if exp != types.Number(3) {
+		t.Fatal("z should 3 but not")
 	}
 }
 

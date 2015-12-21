@@ -179,14 +179,22 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	if _, err := env.Get("#current-load-path"); err != nil {
 		env.Put("#current-load-path", "#f")
 	}
-	exps, err := p.Parse()
-	if err != nil {
-		return nil, err
+	var exps types.Expression
+	for {
+		tokens, err := p.Parse()
+		if err != nil {
+			return nil, err
+		}
+		// TODO should write as EOF or some recognizable token represantation.
+		if tokens == types.Symbol("") {
+			break
+		}
+		exps, err = Eval(tokens, env)
+		if err != nil {
+			return nil, err
+		}
 	}
-	if _, err := Eval(exps, env); err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return exps, nil
 }
 
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.
