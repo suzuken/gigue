@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/scanner"
 )
 
 // Eval is body of evaluator
@@ -175,24 +174,27 @@ func EvalFile(filename string, env *Env) (types.Expression, error) {
 
 // ev evaluate scheme program from io.Reader
 func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
-	l := lexer.New()
-	l.Init(r)
-	l.Scan()
+	l := lexer.New(r)
 	p := parser.New(l)
 	if _, err := env.Get("#current-load-path"); err != nil {
 		env.Put("#current-load-path", "#f")
 	}
-	for l.Token != scanner.EOF {
-		exps, err := p.Parse()
+	var exps types.Expression
+	for {
+		tokens, err := p.Parse()
 		if err != nil {
 			return nil, err
 		}
-		if _, err := Eval(exps, env); err != nil {
+		// TODO should write as EOF or some recognizable token represantation.
+		if tokens == types.Symbol("") {
+			break
+		}
+		exps, err = Eval(tokens, env)
+		if err != nil {
 			return nil, err
 		}
-		l.Scan()
 	}
-	return nil, nil
+	return exps, nil
 }
 
 // Apply receives procedure and arguments. if procedure is compounded, evaluate on extended environment.

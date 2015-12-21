@@ -2,13 +2,9 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"github.com/suzuken/gigue/lexer"
 	"github.com/suzuken/gigue/types"
 	"strconv"
-	"strings"
-	"text/scanner"
-	"unicode"
 )
 
 type Parser struct {
@@ -22,13 +18,16 @@ func New(lex *lexer.Lex) *Parser {
 
 // Parse scans given tokens and return it into expression.
 func (p *Parser) Parse() (exps types.Expression, err error) {
+	token, err := p.lex.Next()
+	if err != nil {
+		return nil, err
+	}
 	// start s-expression
-	if p.lex.Token == '(' {
+	if token == "(" {
 		var list []types.Expression
-		// recursive scan until ')'
+		// recursive scan until ")"
 		for {
-			p.lex.Scan()
-			if p.lex.Token == ')' {
+			if p.lex.Peek() == ')' {
 				break
 			}
 			ex, err := p.Parse()
@@ -37,43 +36,33 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 			}
 			list = append(list, ex)
 		}
+		// detect by Peek(), so scanner should read next rune.
+		p.lex.Scan()
 		return list, nil
-	} else if p.lex.Token == ')' {
-		return exps, errors.New("unexpected ')'")
+	} else if token == ")" {
+		return nil, errors.New("unexpected ')'")
 	} else {
-		if p.lex.Token == scanner.String {
-			t, err := strconv.Unquote(p.lex.TokenText())
-			if err != nil {
-				return nil, err
-			}
-			return t, nil
+		if token == "#t" {
+			return types.Boolean(true), nil
+		} else if token == "#f" {
+			return types.Boolean(false), nil
 		}
 
-		token := p.lex.TokenText()
-		if token == "#" {
-			p.lex.Scan()
-			if t := p.lex.TokenText(); t == "t" {
-				return types.Boolean(true), nil
-			} else if t == "f" {
-				return types.Boolean(false), nil
-			} else {
-				return types.Symbol(token + t), nil
+		// if token is string, get unquoted.
+		// It's get test from \"test\".
+		if p.lex.IsTokenString() {
+			str, err := strconv.Unquote(p.lex.TokenText())
+			if err != nil {
+				return "", err
 			}
+			return str, nil
 		}
+
 		// try conversion to float. if failed, deal with symbol.
 		if n, err := strconv.ParseFloat(token, 64); err == nil {
 			return types.Number(n), nil
 		}
 
-		// concatenate tokens for symbol until end of characters.
-		for {
-			r := p.lex.Peek()
-			if unicode.IsSpace(r) || strings.ContainsRune("()'.,;", r) || r == scanner.EOF {
-				break
-			}
-			token = fmt.Sprintf("%s%c", token, r)
-			p.lex.Next()
-		}
 		return types.Symbol(token), nil
 	}
 }
