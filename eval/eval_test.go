@@ -259,6 +259,9 @@ func TestEvalSet(t *testing.T) {
 	ts(t, "(>= 1 1)", types.Boolean(true))
 	ts(t, "(null? 1)", types.Boolean(false))
 	ts(t, "(null? ())", types.Boolean(true))
+	ts(t, "(null? (cons 1 2))", types.Boolean(false))
+	ts(t, "(list? (list 1 2))", types.Boolean(true))
+	ts(t, "(list? (cons 1 2))", types.Boolean(false))
 }
 
 func TestEvalReader(t *testing.T) {
