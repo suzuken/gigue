@@ -43,8 +43,9 @@ Gigue has REPL.
 
 * `+`, `-`, `*`, `/`
 * `cons`, `car`, `cdr`, `list`
-* `<`, `>`
+* `<`, `>`, `<=`, `>=`
 * `define`, `lambda`, `if`, `cond`, `begin`
+* `null?`, `list?`
 * `load`
 
 ## LICENSE
