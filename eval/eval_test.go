@@ -237,6 +237,30 @@ func TestPrimitiveListOperation(t *testing.T) {
 	}
 }
 
+func ts(t *testing.T, exp string, expected types.Expression) {
+	env := NewEnv()
+	env.Setup()
+	actual, err := EvalReader(strings.NewReader(exp), env)
+	if err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+	if actual != expected {
+		t.Fatalf("eval failed: evaluated: %s, expected %#v, actual %#v", exp, expected, actual)
+	}
+}
+
+func TestEvalSet(t *testing.T) {
+	// primitives
+	ts(t, "1", types.Number(1))
+	ts(t, "#t", types.Boolean(true))
+	ts(t, "(car (list 1 2))", types.Number(1))
+	ts(t, "(= (car (list 1 2)) 1)", types.Boolean(true))
+	ts(t, "(<= 2 1)", types.Boolean(false))
+	ts(t, "(>= 1 1)", types.Boolean(true))
+	ts(t, "(null? 1)", types.Boolean(false))
+	ts(t, "(null? ())", types.Boolean(true))
+}
+
 func TestEvalReader(t *testing.T) {
 	env := NewEnv()
 	env.Setup()

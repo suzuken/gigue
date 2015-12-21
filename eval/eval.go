@@ -24,6 +24,9 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		}
 		return e, nil
 	case []types.Expression:
+		if len(t) == 0 {
+			return &types.Pair{}, nil
+		}
 		// this is multiple expressions pattern
 		// at first, get car. car of expression is symbol for each expression
 		car, ok := t[0].(types.Symbol)

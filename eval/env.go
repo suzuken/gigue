@@ -49,6 +49,8 @@ func NewPrimitiveProcedureFrame() Frame {
 		"/":     Divide,
 		">":     GreaterThan,
 		"<":     LessThan,
+		">=":    GreaterThanEqual,
+		"<=":    LessThanEqual,
 		"eq?":   IsEqual,
 		"=":     IsEqual,
 		"null?": IsNull,
@@ -136,8 +138,16 @@ func GreaterThan(args ...types.Expression) (types.Expression, error) {
 	return types.Boolean(args[0].(types.Number) > args[1].(types.Number)), nil
 }
 
+func GreaterThanEqual(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0].(types.Number) >= args[1].(types.Number)), nil
+}
+
 func LessThan(args ...types.Expression) (types.Expression, error) {
 	return types.Boolean(args[0].(types.Number) < args[1].(types.Number)), nil
+}
+
+func LessThanEqual(args ...types.Expression) (types.Expression, error) {
+	return types.Boolean(args[0].(types.Number) <= args[1].(types.Number)), nil
 }
 
 func IsEqual(args ...types.Expression) (types.Expression, error) {
