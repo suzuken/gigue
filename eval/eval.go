@@ -2,6 +2,7 @@ package eval
 
 import (
 	"errors"
+	"fmt"
 	"github.com/suzuken/gigue/lexer"
 	"github.com/suzuken/gigue/parser"
 	"github.com/suzuken/gigue/types"
@@ -117,13 +118,13 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			if !ok {
 				return nil, errors.New("args of load should be symbol.")
 			}
-			exp, err := env.Get("#current-load-path")
+			current, err := env.Get("#current-load-path")
 			// path is empty
 			if err != nil {
 				return nil, err
 			}
 			// if path is set, search from current directory
-			if p := exp.(string); p != "" {
+			if p := fmt.Sprintf("%s", current); p != "" {
 				// if path start with /, deal as absolute path
 				// if not, deal as relative path
 				if !strings.HasPrefix(path, "/") {
@@ -180,7 +181,7 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	l := lexer.New(r)
 	p := parser.New(l)
 	if _, err := env.Get("#current-load-path"); err != nil {
-		env.Put("#current-load-path", "#f")
+		env.Put("#current-load-path", "")
 	}
 	var exps types.Expression
 	for {
