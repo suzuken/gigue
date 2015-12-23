@@ -30,6 +30,24 @@ func New(r io.Reader) *Lex {
 // Next returns next scheme token
 // Parser calls this Next() iteratively for fetching token.
 func (l *Lex) Next() (string, error) {
+	// ignore comments until EOF or newline.
+	for {
+		token := l.Peek()
+		if token != ';' {
+			break
+		}
+		l.Scan()
+		for {
+			next := l.Scanner.Next()
+			if next == scanner.EOF {
+				l.Token = scanner.EOF
+				return "", nil
+			} else if next == '\n' || next == '\r' {
+				break
+			}
+		}
+	}
+
 	l.Scan()
 	switch l.Token {
 	case '#':

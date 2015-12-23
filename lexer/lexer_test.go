@@ -56,4 +56,5 @@ func TestLexDefine(t *testing.T) {
 	verifyTokenAll(t, "(print 'hoge)", "(,print,',hoge,)")
 	verifyTokenAll(t, "(print\n1)\n", "(,print,1,),")
 	verifyTokenAll(t, "(define x 1)\n(print x)", "(,define,x,1,),(,print,x,)")
+	verifyTokenAll(t, "; this is comment\n(print\n1)", "(,print,1,)")
 }

@@ -160,7 +160,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		}
 	default:
 		// not found any known operands. failed.
-		return nil, errors.New("unknown expression type")
+		return nil, fmt.Errorf("unknown expression type -- %v", exp)
 	}
 	return nil, nil
 }
@@ -227,6 +227,6 @@ func Apply(procedure types.Expression, args []types.Expression) (types.Expressio
 		// primitive procedure
 		return p(args...)
 	default:
-		return nil, errors.New("Unknown procedure type")
+		return nil, fmt.Errorf("unknown procedure type -- %v", procedure)
 	}
 }
