@@ -29,5 +29,8 @@ func StandardLibrary() io.Reader {
 
 (define (cdddr given)
   (cdr (cdr (cdr given))))
+
+(define (caddr given)
+  (car (cdr (cdr given))))
 `)
 }
