@@ -16,6 +16,26 @@ func New(lex *lexer.Lex) *Parser {
 	return &Parser{lex}
 }
 
+// parseList is helper for parsing between ( and ).
+// return tokens.
+func (p *Parser) parseList() ([]types.Expression, error) {
+	var list []types.Expression
+	// recursive scan until ")"
+	for {
+		if p.lex.Peek() == ')' {
+			break
+		}
+		ex, err := p.Parse()
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, ex)
+	}
+	// detect by Peek(), so scanner should read next rune.
+	p.lex.Scan()
+	return list, nil
+}
+
 // Parse scans given tokens and return it into expression.
 func (p *Parser) Parse() (exps types.Expression, err error) {
 	token, err := p.lex.Next()
@@ -25,50 +45,25 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	if token == "'" {
 		// if start with (, deal as list.
 		// recursive scan until ")"
+		// if start with "'(", it's list.
 		if p.lex.Peek() == '(' {
-			var tokens []types.Expression
 			// this is (. skip it.
 			if _, err := p.lex.Next(); err != nil {
 				return nil, err
 			}
-			for {
-				if p.lex.Peek() == ')' {
-					break
-				}
-				ex, err := p.Parse()
-				if err != nil {
-					return nil, err
-				}
-				tokens = append(tokens, ex)
+			tokens, err := p.parseList()
+			if err != nil {
+				return nil, err
 			}
-			p.lex.Scan()
 			return types.NewList(tokens...), nil
 		}
-		// if not, it's symbol
-		next, err := p.lex.Next()
-		if err != nil {
-			return nil, err
-		}
-		return next, nil
+		// if not start with (, it's simply string (return string itself).
+		return p.lex.Next()
 	}
 
 	// start s-expression
 	if token == "(" {
-		var list []types.Expression
-		// recursive scan until ")"
-		for {
-			if p.lex.Peek() == ')' {
-				break
-			}
-			ex, err := p.Parse()
-			if err != nil {
-				return nil, err
-			}
-			list = append(list, ex)
-		}
-		// detect by Peek(), so scanner should read next rune.
-		p.lex.Scan()
-		return list, nil
+		return p.parseList()
 	} else if token == ")" {
 		return nil, errors.New("unexpected ')'")
 	} else {
@@ -81,11 +76,7 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 		// if token is string, get unquoted.
 		// It's get test from \"test\".
 		if p.lex.IsTokenString() {
-			str, err := strconv.Unquote(p.lex.TokenText())
-			if err != nil {
-				return "", err
-			}
-			return str, nil
+			return strconv.Unquote(p.lex.TokenText())
 		}
 
 		// try conversion to float. if failed, deal with symbol.
