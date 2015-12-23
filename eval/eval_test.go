@@ -1,6 +1,7 @@
 package eval
 
 import (
+	"fmt"
 	"github.com/suzuken/gigue/types"
 	"os"
 	"path/filepath"
@@ -254,13 +255,13 @@ func tt(t *testing.T, exp string, expected string) {
 	env.Setup()
 	actual, err := EvalReader(strings.NewReader(exp), env)
 	if err != nil {
-		t.Fatalf("eval but error : %s", err)
+		t.Fatalf("eval but error : %s, evaluated: %s", err, exp)
 	}
 	evaled, err := EvalReader(strings.NewReader(expected), env)
 	if err != nil {
-		t.Fatalf("eval but error : %s", err)
+		t.Fatalf("eval but error : %s, evaluated: %s", err, exp)
 	}
-	if actual != evaled {
+	if fmt.Sprintf("%v", actual) != fmt.Sprintf("%v", evaled) {
 		t.Fatalf("eval failed: evaluated: %s => %#v, expected %s => %#v", exp, actual, expected, evaled)
 	}
 }
@@ -283,6 +284,11 @@ func TestEvalSet(t *testing.T) {
 	tt(t, "(= 1 1)", "#t")
 	tt(t, "(null? '())", "#t")
 	tt(t, "(null? '(1 2))", "#f")
+
+	tt(t, "(cadr (list 1 2 3))", "2")
+	tt(t, "(cddr (list 1 2 3))", "'(3)")
+	tt(t, "(cdddr (list 1 2 3))", "'()")
+	tt(t, "(caar (cons (cons 1 2) 3))", "1")
 }
 
 func TestEvalReader(t *testing.T) {

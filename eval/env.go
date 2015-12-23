@@ -31,8 +31,19 @@ func (e *Env) Extend(frame Frame) {
 }
 
 // Setup returns initial environment for evaluation.
+// Primitive procedures is defined by Go, inner intepriter.
+// Standard library is written in Scheme, extend it's functionality.
 func (e *Env) Setup() {
 	e.Extend(NewPrimitiveProcedureFrame())
+	e.LoadStandardLibrary()
+}
+
+// LoadStandardLibrary load gigue's standard library and create it's environment.
+func (env *Env) LoadStandardLibrary() error {
+	if _, err := EvalReader(StandardLibrary(), env); err != nil {
+		return err
+	}
+	return nil
 }
 
 // NewPrimitiveProcedureFrame returns frame of primitive procedures.
