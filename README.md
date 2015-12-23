@@ -42,10 +42,10 @@ Gigue has REPL.
 ## Features
 
 * `+`, `-`, `*`, `/`
-* `cons`, `car`, `cdr`, `list`
+* `cons`, `car`, `cdr`, `list`, `cadr`, `cdar`, `cddr`, `caaar`, `caddr`, `cdadr`, `cddar`, `cdddr`
 * `<`, `>`, `<=`, `>=`
 * `define`, `lambda`, `if`, `cond`, `begin`
-* `null?`, `list?`
+* `null?`, `list?`, `symbol?`, `string?`
 * `load`
 
 ## LICENSE
