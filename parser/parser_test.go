@@ -177,3 +177,29 @@ func TestNewLine(t *testing.T) {
 		t.Fatalf("expressions is not expected. %v", exps)
 	}
 }
+
+func TestQuote(t *testing.T) {
+	r := strings.NewReader("'hello")
+	parser := New(lexer.New(r))
+	actual := "hello"
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %v", exps)
+	}
+}
+
+func TestQuoteList(t *testing.T) {
+	r := strings.NewReader("'(1 2)")
+	parser := New(lexer.New(r))
+	actual := types.NewList(types.Number(1), types.Number(2))
+	exps, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parser failed: %s", err)
+	}
+	if !reflect.DeepEqual(exps, actual) {
+		t.Fatalf("expressions is not expected. %v", exps)
+	}
+}

@@ -14,7 +14,7 @@ import (
 // Eval is body of evaluator
 func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 	switch t := exp.(type) {
-	case types.Boolean, types.Number, string:
+	case types.Boolean, types.Number, *types.Pair, string:
 		return t, nil
 	case types.Symbol:
 		// it's variable or expression. get value from environment
@@ -31,7 +31,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		// at first, get car. car of expression is symbol for each expression
 		car, ok := t[0].(types.Symbol)
 		if !ok {
-			return nil, errors.New("cannot conversion car of expressions. it should be types.Symbol but not.")
+			return nil, errors.New("cannot conversion the first token of expressions. it should be types.Symbol.")
 		}
 		switch car {
 		case "define":

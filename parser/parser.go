@@ -22,6 +22,36 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if token == "'" {
+		// if start with (, deal as list.
+		// recursive scan until ")"
+		if p.lex.Peek() == '(' {
+			var tokens []types.Expression
+			// this is (. skip it.
+			if _, err := p.lex.Next(); err != nil {
+				return nil, err
+			}
+			for {
+				if p.lex.Peek() == ')' {
+					break
+				}
+				ex, err := p.Parse()
+				if err != nil {
+					return nil, err
+				}
+				tokens = append(tokens, ex)
+			}
+			p.lex.Scan()
+			return types.NewList(tokens...), nil
+		}
+		// if not, it's symbol
+		next, err := p.lex.Next()
+		if err != nil {
+			return nil, err
+		}
+		return next, nil
+	}
+
 	// start s-expression
 	if token == "(" {
 		var list []types.Expression
