@@ -249,6 +249,22 @@ func ts(t *testing.T, exp string, expected types.Expression) {
 	}
 }
 
+func tt(t *testing.T, exp string, expected string) {
+	env := NewEnv()
+	env.Setup()
+	actual, err := EvalReader(strings.NewReader(exp), env)
+	if err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+	evaled, err := EvalReader(strings.NewReader(expected), env)
+	if err != nil {
+		t.Fatalf("eval but error : %s", err)
+	}
+	if actual != evaled {
+		t.Fatalf("eval failed: evaluated: %s => %#v, expected %s => %#v", exp, actual, expected, evaled)
+	}
+}
+
 func TestEvalSet(t *testing.T) {
 	// primitives
 	ts(t, "1", types.Number(1))
@@ -262,6 +278,11 @@ func TestEvalSet(t *testing.T) {
 	ts(t, "(null? (cons 1 2))", types.Boolean(false))
 	ts(t, "(list? (list 1 2))", types.Boolean(true))
 	ts(t, "(list? (cons 1 2))", types.Boolean(false))
+
+	tt(t, "#t", "#t")
+	tt(t, "(= 1 1)", "#t")
+	tt(t, "(null? '())", "#t")
+	tt(t, "(null? '(1 2))", "#f")
 }
 
 func TestEvalReader(t *testing.T) {
