@@ -270,6 +270,7 @@ func TestEvalSet(t *testing.T) {
 	// primitives
 	ts(t, "1", types.Number(1))
 	ts(t, "#t", types.Boolean(true))
+	ts(t, "'hi", types.Symbol("hi"))
 	ts(t, "(car (list 1 2))", types.Number(1))
 	ts(t, "(= (car (list 1 2)) 1)", types.Boolean(true))
 	ts(t, "(<= 2 1)", types.Boolean(false))
@@ -289,6 +290,15 @@ func TestEvalSet(t *testing.T) {
 	tt(t, "(cddr (list 1 2 3))", "'(3)")
 	tt(t, "(cdddr (list 1 2 3))", "'()")
 	tt(t, "(caar (cons (cons 1 2) 3))", "1")
+
+	tt(t, "(string? \"hi\")", "#t")
+	tt(t, "(string? \"\")", "#t")
+	tt(t, "(string? 1)", "#f")
+	tt(t, "(string? '())", "#f")
+
+	tt(t, "(symbol? 'hi)", "#t")
+	tt(t, "(symbol? 1)", "#f")
+	tt(t, "(symbol? '())", "#f")
 }
 
 func TestEvalReader(t *testing.T) {

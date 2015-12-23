@@ -181,7 +181,7 @@ func TestNewLine(t *testing.T) {
 func TestQuote(t *testing.T) {
 	r := strings.NewReader("'hello")
 	parser := New(lexer.New(r))
-	actual := "hello"
+	actual := types.Symbol("hello")
 	exps, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("parser failed: %s", err)

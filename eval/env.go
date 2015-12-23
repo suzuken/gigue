@@ -50,23 +50,25 @@ func (env *Env) LoadStandardLibrary() error {
 // Gigue provides functionality of base scheme procedure.
 func NewPrimitiveProcedureFrame() Frame {
 	return Frame{
-		"car":   Car,
-		"cdr":   Cdr,
-		"cons":  Cons,
-		"print": Print,
-		"+":     Add,
-		"-":     Subtract,
-		"*":     Multiply,
-		"/":     Divide,
-		">":     GreaterThan,
-		"<":     LessThan,
-		">=":    GreaterThanEqual,
-		"<=":    LessThanEqual,
-		"eq?":   IsEqual,
-		"=":     IsEqual,
-		"null?": IsNull,
-		"list":  List,
-		"list?": IsList,
+		"car":     Car,
+		"cdr":     Cdr,
+		"cons":    Cons,
+		"print":   Print,
+		"+":       Add,
+		"-":       Subtract,
+		"*":       Multiply,
+		"/":       Divide,
+		">":       GreaterThan,
+		"<":       LessThan,
+		">=":      GreaterThanEqual,
+		"<=":      LessThanEqual,
+		"eq?":     IsEqual,
+		"=":       IsEqual,
+		"null?":   IsNull,
+		"list":    List,
+		"list?":   IsList,
+		"string?": IsString,
+		"symbol?": IsSymbol,
 	}
 }
 
@@ -185,6 +187,20 @@ func IsList(args ...types.Expression) (types.Expression, error) {
 	return types.Boolean(pair.IsList()), nil
 }
 
+func IsString(args ...types.Expression) (types.Expression, error) {
+	if _, ok := args[0].(string); !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(true), nil
+}
+
+func IsSymbol(args ...types.Expression) (types.Expression, error) {
+	if _, ok := args[0].(types.Symbol); !ok {
+		return types.Boolean(false), nil
+	}
+	return types.Boolean(true), nil
+}
+
 // Put creates new symbol to table
 func (e *Env) Put(s types.Symbol, exp types.Expression) {
 	e.Lock()
@@ -201,8 +217,8 @@ func (e *Env) Get(s types.Symbol) (types.Expression, error) {
 		if e.parent != nil {
 			return e.parent.Get(s)
 		}
-		// or return nil?
-		return nil, fmt.Errorf("symbol not found from the environment: symbol %s", s)
+		// if symbol not found, return itself
+		return s, nil
 	}
 	return v, nil
 }

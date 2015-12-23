@@ -58,7 +58,11 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 			return types.NewList(tokens...), nil
 		}
 		// if not start with (, it's simply string (return string itself).
-		return p.lex.Next()
+		t, err := p.lex.Next()
+		if err != nil {
+			return nil, err
+		}
+		return types.Symbol(t), nil
 	}
 
 	// start s-expression
