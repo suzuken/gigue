@@ -4,7 +4,9 @@ import (
 	"errors"
 	"github.com/suzuken/gigue/lexer"
 	"github.com/suzuken/gigue/types"
+	"io"
 	"strconv"
+	"text/scanner"
 )
 
 type Parser struct {
@@ -22,6 +24,9 @@ func (p *Parser) parseList() ([]types.Expression, error) {
 	var list []types.Expression
 	// recursive scan until ")"
 	for {
+		if p.lex.Peek() == scanner.EOF {
+			return nil, io.EOF
+		}
 		if p.lex.Peek() == ')' {
 			break
 		}
