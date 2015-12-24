@@ -189,7 +189,7 @@ func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-		// TODO should write as EOF or some recognizable token represantation.
+		// TODO should handle unknown token.
 		if tokens == types.Symbol("") {
 			break
 		}
