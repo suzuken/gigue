@@ -9,6 +9,7 @@ import (
 	"text/scanner"
 )
 
+// Parser is struct for token parser.
 type Parser struct {
 	lex *lexer.Lex
 }

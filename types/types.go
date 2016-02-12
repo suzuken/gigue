@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// S is S-expression
+// Expression is S-expression
 type Expression interface{}
 
 // Number is number of scheme. (based on Go float64)
@@ -54,12 +54,9 @@ func (p *Pair) String() string {
 	return fmt.Sprintf("(%v . %v)", p.Car, p.Cdr)
 }
 
+// IsNull checking if pair is null or not.
 func (p *Pair) IsNull() bool {
 	return p.Car == nil && p.Cdr == nil
-}
-
-func (p *Pair) IsPair() bool {
-	return !p.IsNull()
 }
 
 // IsList returns if pair is list or not.
@@ -81,7 +78,8 @@ func (p *Pair) IsList() bool {
 	}
 }
 
-// Append add cons to given pair
+// Append add cons pair to given pair
+// exp, first arguments of callee, should be car of this pair.
 func (p *Pair) Append(exp Expression) *Pair {
 	// append exp to tail
 	pp := p
@@ -96,6 +94,8 @@ func (p *Pair) Append(exp Expression) *Pair {
 	return pp
 }
 
+// NewList makes concatenated pair's list.
+// Internally, using appned for this operation.
 func NewList(args ...Expression) *Pair {
 	p := &Pair{Car: nil, Cdr: nil}
 	for _, arg := range args {

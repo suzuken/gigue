@@ -90,6 +90,7 @@ func Cdr(args ...types.Expression) (types.Expression, error) {
 	return a.Cdr, nil
 }
 
+// Cons makes pairs with given arguments.
 func Cons(args ...types.Expression) (types.Expression, error) {
 	return &types.Pair{Car: args[0], Cdr: args[1]}, nil
 }
