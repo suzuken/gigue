@@ -1,3 +1,4 @@
+// Package eval implements an evaluator of gigue.
 package eval
 
 import (
@@ -32,12 +33,12 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		// at first, get car. car of expression is symbol for each expression
 		car, ok := t[0].(types.Symbol)
 		if !ok {
-			return nil, errors.New("cannot conversion the first token of expressions. it should be types.Symbol.")
+			return nil, errors.New("cannot conversion the first token of expressions. it should be types.Symbol")
 		}
 		switch car {
 		case "define":
 			if len(t) < 2 {
-				return nil, errors.New("define clause must have symbol and body.")
+				return nil, errors.New("define clause must have symbol and body")
 			}
 			switch tt := t[1].(type) {
 			// put symbol and variables
@@ -53,11 +54,11 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			// above style is syntax sugar for lambda.
 			case []types.Expression:
 				if len(tt) < 2 {
-					return nil, errors.New("define statament must have more than 2 words.")
+					return nil, errors.New("define statament must have more than 2 words")
 				}
 				caddr, ok := tt[0].(types.Symbol)
 				if !ok {
-					return nil, errors.New("(define x) of x should be symbol..")
+					return nil, errors.New("(define x) of x should be symbol")
 				}
 				// create lambda and put it into environment
 				env.Put(caddr, Lambda{tt[1:], t[2], env})
@@ -75,9 +76,8 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 			if bb {
 				return Eval(t[2], env)
-			} else {
-				return Eval(t[3], env)
 			}
+			return Eval(t[3], env)
 		case "cond":
 			for _, operand := range t[1:] {
 				tt, ok := operand.([]types.Expression)
@@ -98,7 +98,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			}
 		case "lambda":
 			if len(t) < 3 {
-				return nil, errors.New("lambda must have more than 3 words.")
+				return nil, errors.New("lambda must have more than 3 words")
 			}
 			return Lambda{t[1], t[2], env}, nil
 		case "begin":
@@ -116,7 +116,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			// (load "file.scm") loading file and evaluate it.
 			path, ok := t[1].(string)
 			if !ok {
-				return nil, errors.New("args of load should be symbol.")
+				return nil, errors.New("args of load should be symbol")
 			}
 			current, err := env.Get("#current-load-path")
 			// path is empty
@@ -139,7 +139,7 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 			return EvalFile(abs, env)
 		default:
 			// extend environment
-			exps := make([]types.Expression, 0)
+			exps := make([]types.Expression, 0, len(t)-1)
 			for _, operand := range t[1:] {
 				exp, err := Eval(operand, env)
 				if err != nil {
@@ -176,7 +176,7 @@ func EvalFile(filename string, env *Env) (types.Expression, error) {
 	return EvalReader(f, env)
 }
 
-// ev evaluate scheme program from io.Reader
+// EvalReader evaluate scheme program from io.Reader
 func EvalReader(r io.Reader, env *Env) (types.Expression, error) {
 	l := lexer.New(r)
 	p := parser.New(l)
