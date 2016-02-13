@@ -1,6 +1,7 @@
 # Gigue
 
 [![Build Status](https://travis-ci.org/suzuken/gigue.svg)](https://travis-ci.org/suzuken/gigue)
+[![Go Report Card](https://goreportcard.com/badge/github.com/suzuken/gigue)](https://goreportcard.com/report/github.com/suzuken/gigue)
 
 One day after reading [SICP](https://mitpress.mit.edu/sicp/), I interested in implement my own scheme interpriter for practice. A design of Gigue is based on scheme interpriter of [SICP Chapter 4](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-25.html#%_chap_4).
 
