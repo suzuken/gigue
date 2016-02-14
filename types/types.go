@@ -99,10 +99,9 @@ func (p *Pair) Append(exp Expression) *Pair {
 func NewList(args ...Expression) *Pair {
 	// In normal, p is prefer to be defined by var statement because of no allocation.
 	// But in this case, for empty list should be return empty pair.
-	p, prev := &Pair{}, &Pair{}
+	p := &Pair{}
 	for i := len(args) - 1; i >= 0; i-- {
-		p = &Pair{args[i], prev}
-		prev = p
+		p = &Pair{args[i], p}
 	}
 	return p
 }
