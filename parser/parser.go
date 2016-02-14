@@ -48,7 +48,9 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 	if err != nil {
 		return nil, err
 	}
-	if token == "'" {
+
+	switch token {
+	case "'":
 		// if start with (, deal as list.
 		// recursive scan until ")"
 		// if start with "'(", it's list.
@@ -69,31 +71,25 @@ func (p *Parser) Parse() (exps types.Expression, err error) {
 			return nil, err
 		}
 		return types.Symbol(t), nil
-	}
-
-	// start s-expression
-	if token == "(" {
+	case "(":
+		// start S-Expression. Parse as list.
 		return p.parseList()
-	} else if token == ")" {
+	case ")":
 		return nil, errors.New("unexpected ')'")
-	} else {
-		if token == "#t" {
-			return types.Boolean(true), nil
-		} else if token == "#f" {
-			return types.Boolean(false), nil
-		}
-
+	case "#t":
+		return types.Boolean(true), nil
+	case "#f":
+		return types.Boolean(false), nil
+	default:
 		// if token is string, get unquoted.
 		// It's get test from \"test\".
 		if p.lex.IsTokenString() {
 			return strconv.Unquote(p.lex.TokenText())
 		}
-
-		// try conversion to float. if failed, deal with symbol.
+		// try conversion to float. if failed, treated as symbol.
 		if n, err := strconv.ParseFloat(token, 64); err == nil {
 			return types.Number(n), nil
 		}
-
 		return types.Symbol(token), nil
 	}
 }
