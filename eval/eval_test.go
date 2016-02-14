@@ -43,6 +43,47 @@ func TestEvalSum(t *testing.T) {
 
 }
 
+func TestEvalIf(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	r, err := Eval([]types.Expression{
+		types.Symbol("if"),
+		types.Boolean(true),
+		types.Number(1),
+		types.Number(2),
+	}, env)
+	if err != nil {
+		t.Fatalf("eval if, but error : %s", err)
+	}
+	if r != types.Number(1) {
+		t.Fatalf("given (if #t 1 2) should be 1 but get: %v", r)
+	}
+}
+
+func TestEvalCond(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+
+	r, err := Eval([]types.Expression{
+		types.Symbol("cond"),
+		[]types.Expression{
+			types.Boolean(true),
+			types.Number(1),
+		},
+		[]types.Expression{
+			types.Symbol("else"),
+			types.Number(2),
+		},
+	}, env)
+	if err != nil {
+		t.Fatalf("eval cond, but error : %s", err)
+	}
+	if r != types.Number(1) {
+		t.Fatalf("given (cond ((#t) 1) (else 2)) should be 1 but get: %v", r)
+	}
+}
+
 func TestEvalDefineAndCaliculation(t *testing.T) {
 	env := NewEnv()
 	env.Setup()
