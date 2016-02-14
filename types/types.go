@@ -95,11 +95,14 @@ func (p *Pair) Append(exp Expression) *Pair {
 }
 
 // NewList makes concatenated pair's list.
-// Internally, using appned for this operation.
+// Internally, creating last pair and concatenate it with previous pair.
 func NewList(args ...Expression) *Pair {
-	p := &Pair{Car: nil, Cdr: nil}
-	for _, arg := range args {
-		p.Append(arg)
+	// In normal, p is prefer to be defined by var statement because of no allocation.
+	// But in this case, for empty list should be return empty pair.
+	p, prev := &Pair{}, &Pair{}
+	for i := len(args) - 1; i >= 0; i-- {
+		p = &Pair{args[i], prev}
+		prev = p
 	}
 	return p
 }
