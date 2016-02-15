@@ -194,7 +194,6 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		// not found any known operands. failed.
 		return nil, fmt.Errorf("unknown expression type -- %v", exp)
 	}
-	return nil, nil
 }
 
 // EvalFile evaluate given file
