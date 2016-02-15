@@ -38,6 +38,7 @@ func TestEvalSum(t *testing.T) {
 		t.Fatalf("eval but error : %s", err)
 	}
 	if r != types.Number(3) {
+
 		t.Fatalf("1 + 2 should 3 but not: %v", r)
 	}
 
@@ -388,5 +389,19 @@ func visit(t *testing.T) filepath.WalkFunc {
 func TestExecute(t *testing.T) {
 	if err := filepath.Walk("../examples", visit(t)); err != nil {
 		t.Fatalf("eval file failed: %s", err)
+	}
+}
+
+// https://github.com/suzuken/gigue/issues/13
+func TestEvalIfClauseAtHeadOfList(t *testing.T) {
+	env := NewEnv()
+	env.Setup()
+	exp := "((if #f + *) 3 4)"
+	ret, err := EvalReader(strings.NewReader(exp), env)
+	if err != nil {
+		t.Fatalf("fail to evaluate %s: err", exp, err)
+	}
+	if ret != types.Number(12) {
+		t.Fatalf("fail to evaluate %s should be 12 but does not match: %#v", exp, ret)
 	}
 }

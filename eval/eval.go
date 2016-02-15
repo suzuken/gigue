@@ -127,7 +127,7 @@ func evalLoad(path string, env *Env) (types.Expression, error) {
 	return EvalFile(abs, env)
 }
 
-func evalApplication(env *Env, operator types.Symbol, operands ...types.Expression) (types.Expression, error) {
+func evalApplication(env *Env, operator types.Expression, operands ...types.Expression) (types.Expression, error) {
 	// extend environment
 	exps := make([]types.Expression, 0, len(operands)-1)
 	for _, operand := range operands {
@@ -161,40 +161,34 @@ func Eval(exp types.Expression, env *Env) (types.Expression, error) {
 		if len(t) == 0 {
 			return &types.Pair{}, nil
 		}
-		// this is multiple expressions pattern
-		// at first, get car. car of expression is symbol for each expression
-		car, ok := t[0].(types.Symbol)
-		if !ok {
-			return nil, errors.New("cannot conversion the first token of expressions. it should be types.Symbol")
-		}
-		switch car {
-		case "define":
+		switch t[0] {
+		case types.Symbol("define"):
 			return evalDefine(t, env)
-		case "if":
+		case types.Symbol("if"):
 			if len(t) < 4 {
 				return nil, errors.New("syntax error: if clause must be (if predicate consequent alternative) style")
 			}
 			return evalIf(t[1], t[2], t[3], env)
-		case "cond":
+		case types.Symbol("cond"):
 			if len(t) < 2 {
 				return nil, errors.New("syntax error: cond clause must be (cond predicate consequent alternative) style")
 			}
 			return evalCond(t, env)
-		case "lambda":
+		case types.Symbol("lambda"):
 			if len(t) < 3 {
 				return nil, errors.New("lambda must have more than 3 words")
 			}
 			return Lambda{t[1], t[2], env}, nil
-		case "begin":
+		case types.Symbol("begin"):
 			return evalBegin(env, t[1:]...)
-		case "load":
+		case types.Symbol("load"):
 			path, ok := t[1].(string)
 			if !ok {
 				return nil, errors.New("syntax error: args of load should be string")
 			}
 			return evalLoad(path, env)
 		default:
-			return evalApplication(env, car, t[1:]...)
+			return evalApplication(env, t[0], t[1:]...)
 		}
 	default:
 		// not found any known operands. failed.
